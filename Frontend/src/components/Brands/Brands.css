@@ -1,0 +1,48 @@
+     .brands-section {
+         padding: 40px;
+         background: #f6f7fb;
+     }
+     
+     .brands-section h2 {
+         margin-bottom: 20px;
+         font-size: 22px;
+         color: #0a2c66;
+     }
+     /* Brand card */
+     
+     .brand-card {
+         min-width: 140px;
+         height: 80px;
+         background: white;
+         border-radius: 12px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         cursor: pointer;
+         transition: transform 0.3s, box-shadow 0.3s;
+     }
+     
+     .brand-card:hover {
+         transform: translateY(-4px);
+         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+     }
+     
+     .brand-card img {
+         max-width: 90px;
+         max-height: 40px;
+         object-fit: contain;
+     }
+     
+     .brands-bar {
+         display: flex;
+         gap: 20px;
+         overflow-x: auto;
+         padding-bottom: 12px;
+         scroll-behavior: smooth;
+         scrollbar-width: none;
+         -ms-overflow-style: none;
+     }
+     
+     .brands-bar::-webkit-scrollbar {
+         display: none;
+     }

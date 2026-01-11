@@ -1,0 +1,146 @@
+.login {
+    min-height: 100vh;
+    /* background: url(/background.png) no-repeat; */
+    width: 100%;
+    background: linear-gradient(135deg, #eef3ff, #ffffff);
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.login .logo {
+    width: max(20vw, 200px);
+}
+
+.loginform {
+    background: white;
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 10px;
+    border: solid skyblue 2px;
+}
+
+
+/* Left side */
+
+.login-left {
+    flex: 1;
+    background: linear-gradient(135deg, #0a2c66, #0a5bd3);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-left h1 {
+    font-size: 36px;
+    z-index: 2;
+}
+
+.login-left p {
+    margin-top: 10px;
+    font-size: 16px;
+    z-index: 2;
+}
+
+
+/* floating shapes */
+
+.floating-shape {
+    position: absolute;
+    opacity: 0.25;
+    animation: float 6s infinite ease-in-out;
+}
+
+.circle {
+    width: 160px;
+    height: 160px;
+    background: white;
+    border-radius: 50%;
+    top: 10%;
+    left: 10%;
+}
+
+.square {
+    width: 120px;
+    height: 120px;
+    background: #f1c40f;
+    bottom: 15%;
+    right: 15%;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+
+/*  */
+
+.loginform h2 {
+    font-weight: 500;
+}
+
+.form-input {
+    padding: 8px 10px;
+    border: 1px solid #c9c9c9;
+    border-radius: 4px;
+    outline-color: #077eff;
+}
+
+.loginform button {
+    padding: 10px;
+    background-color: #077eff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-term {
+    display: flex;
+    gap: 5px;
+    font-size: 12px;
+    color: #808080;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #f5c6cb;
+}
+
+.login-forget {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.login-toggle {
+    font-size: 15px;
+    color: #077eff;
+}
+
+.login-toggle span {
+    font-weight: 500;
+    color: #077eff;
+    cursor: pointer;
+}

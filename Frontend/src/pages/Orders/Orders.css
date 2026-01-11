@@ -1,0 +1,126 @@
+.orders-wrapper {
+    display: flex;
+    background: #f5f7fa;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+
+/* Sidebar */
+
+.orders-sidebar {
+    width: 260px;
+    background: #fff;
+    padding: 20px 0;
+}
+
+.profile-box {
+    background: #e8eafc;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    background: #bbb;
+    border-radius: 50%;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.menu li {
+    padding: 14px 25px;
+    cursor: pointer;
+    color: #333;
+}
+
+.menu li.active {
+    font-weight: bold;
+    color: #0a2885;
+}
+
+
+/* Main Content */
+
+.orders-content {
+    flex: 1;
+    padding: 30px;
+}
+
+.breadcrumb {
+    color: #555;
+    font-size: 14px;
+}
+
+h2 {
+    margin: 15px 0;
+}
+
+
+/* Tabs */
+
+.tabs,
+.sub-tabs {
+    display: flex;
+    gap: 25px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tabs button,
+.sub-tabs button {
+    background: none;
+    border: none;
+    padding-bottom: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.tabs button.active,
+.sub-tabs button.active {
+    border-bottom: 3px solid #2b3cff;
+    color: #2b3cff;
+    font-weight: 600;
+}
+
+
+/* Empty State */
+
+.empty-orders {
+    background: #fff;
+    border-radius: 14px;
+    padding: 60px 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.icon-box {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.empty-orders h3 {
+    margin-bottom: 8px;
+}
+
+.empty-orders p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.continue-btn {
+    background: #0a2885;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+}

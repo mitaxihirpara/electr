@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <defs>
+    <!-- Original blue → purple gradient -->
+    <linearGradient id="emGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00E5FF"></stop>
+      <stop offset="100%" stop-color="#7A00FF"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- EM LETTERS (PURE PATHS, SOLID) -->
+  <g fill="url(#emGrad)">
+    <!-- E -->
+    <path d="
+      M120 90
+      H230 V120 H155 V145 H215 V175 H155 V200 H230 V230
+      H120 Z
+    "></path>
+
+    <!-- M -->
+    <path d="
+      M260 230
+      V90 H305 L350 155 L395 90 H440 V230
+      H405 V135 L350 205 L295 135 V230
+      Z
+    "></path>
+  </g>
+
+  <!-- ELECTROMART -->
+  <text x="300" y="290" text-anchor="middle" font-size="36" letter-spacing="6" font-weight="600" font-family="Arial, Helvetica, sans-serif" fill="#1A1AFF">
+    ELECTROMART
+  </text>
+</svg>

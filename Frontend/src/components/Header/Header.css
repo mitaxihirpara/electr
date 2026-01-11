@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.navbar {
+    height: 60px;
+    background-color: #0a2c66;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 40px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    color: white;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.nav-logo-img {
+    height: 35px;
+    object-fit: contain;
+}
+
+
+/* Nav links */
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #ffff;
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.25s ease;
+}
+
+.nav-links li a:hover {
+    color: #f1c40f;
+}
+
+
+/* Search container */
+
+.nav-search {
+    display: flex;
+    /* align-items: center; */
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background-color: #fff;
+    width: 600px;
+}
+
+
+/* Input field */
+
+.nav-search input {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 160px;
+}
+
+
+/* Search icon */
+
+.nav-search .search-icon {
+    color: #666;
+    margin-left: 390px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+/* Focus effect */
+
+.nav-search:focus-within {
+    border-color: #0a5bd3;
+}
+
+
+/* Right side (search + cart) */
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.nav-right a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #ffff;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.nav-right a:hover {
+    color: #f1c40f;
+}
+
+
+/* Icon size */
+
+.nav-right svg {
+    font-size: 18px;
+}
+
+
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-email {
+    font-size: 14px;
+    color: #ffff;
+}
+
+.logout-link {
+    background: none;
+    border: none;
+    color: #ffff;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.logout-link:hover {
+    color: #f1c40f;
+}
+
+/* Cart specific */
+
+.nav-cart-icon {
+    position: relative;
+    font-weight: 600;
+}
