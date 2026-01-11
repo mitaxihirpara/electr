@@ -36,14 +36,7 @@ const App = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/products/:category" element={<ProductCategory />} />
-        <Route 
-          path="/admin/dashboard" 
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboard />
-            </ProtectedAdminRoute>
-          } 
-        />
+        
       </Routes>
       <Footer />
     </>

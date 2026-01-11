@@ -7,8 +7,8 @@ import { faCartShopping, faMagnifyingGlass, faUser,faHeart, faShieldAlt } from "
 
 
 const Navbar = () => {
-  const { isAdmin, user, logout } = useAuth();
 
+  // const{user, logout} = useAuth();
   return (
     <div className="navbar">
       {/* Logo */}
@@ -38,21 +38,16 @@ const Navbar = () => {
         <Link to="/cart" className="nav-cart-icon">
           <FontAwesomeIcon icon={faCartShopping} /> Cart
         </Link>
-        {isAdmin && (
-          <Link to="/admin/dashboard" className="admin-link">
-            <FontAwesomeIcon icon={faShieldAlt} /> Admin Panel
-          </Link>
-        )}
-        {user ? (
+        {/* {user ? (
           <div className="user-menu">
             <span className="user-email">{user.email}</span>
             <button onClick={logout} className="logout-link">Logout</button>
           </div>
-        ) : (
+        ) : ( */}
           <Link to="/login" className="login-icon">
             <FontAwesomeIcon icon={faUser} /> Login
           </Link>
-        )}
+        {/* )} */}
       </div>
     </div>
   );
