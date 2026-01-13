@@ -1,0 +1,54 @@
+.deals-section {
+    padding: 40px;
+    background: #f6f7fb;
+}
+
+.deals-section h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.deals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.deal-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 3px solid #00a3e0;
+    transition: transform 0.3s;
+}
+
+.deal-card:hover {
+    transform: translateY(-5px);
+}
+
+.deal-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.price span {
+    margin-left: 10px;
+    color: #888;
+    text-decoration: line-through;
+}
+
+.discount {
+    color: #0a2d82;
+    font-size: 14px;
+}
+
+.deals-section {
+    min-height: 300px;
+}
