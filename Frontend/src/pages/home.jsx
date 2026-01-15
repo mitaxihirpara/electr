@@ -10,8 +10,8 @@ const Home = () => {
       
       <OptionBar />
       <Ads />
-       <Brands />
-        <SpecialDeals />
+      <SpecialDeals />
+      <Brands />
     </>
   );
 };

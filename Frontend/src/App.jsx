@@ -11,7 +11,9 @@ import Orders from "./pages/Orders/Orders";
 import Contact from "./pages/Contact/Contact";
 import Cart from "./components/Cart/Cart";
 import Wishlist from "./pages/Wishlist/Wishlist";
-import ProductCategory from "./pages/Products/ProductCategory";
+import MobileCatalog from "./pages/mobilecatelog";
+import TvCatalog from "./pages/tvcatelog/tvcatelog";
+
 
 import AdminLogin from "./admin/Adminlogin";
 import AdminDashboard from "./admin/Dashboard";
@@ -31,12 +33,15 @@ const App = () => {
       <Routes>
         {/* USER ROUTES */}
         <Route path="/" element={<Home />} />
+        <Route path="/mobiles" element={<MobileCatalog />} />
+        <Route path="/tvs" element={<TvCatalog />} />
         <Route path="/login" element={<Login />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/products/:category" element={<ProductCategory />} />
+        
+        {/* <Route path="/products/:category" element={<ProductCategory />} /> */}
 
         {/* ADMIN LOGIN */}
         <Route path="/admin-login" element={<AdminLogin />} />
