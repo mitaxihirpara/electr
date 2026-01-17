@@ -16,7 +16,8 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
-    database="electromart"
+    database="Electromart",
+    port=3307
 )
 
 @app.route("/")
@@ -33,7 +34,7 @@ def admin_login():
 
     cursor = db.cursor(dictionary=True)
     cursor.execute(
-        "SELECT * FROM admins WHERE email=%s AND password=%s",
+        "SELECT * FROM admin WHERE email=%s AND password=%s",
         (email, password)
     )
 
@@ -59,113 +60,31 @@ def serve_image(filename):
 
 @app.route("/api/deals", methods=["GET"])
 def get_deals():
-    deals = [
-         {
-            "id": 1,
-            "title": "LED smart Tv",
-            "price": 40499,
-             "old_price": 45999,
-            "discount_text": "12% OFF",
-            "image_url": "http://127.0.0.1:5000/uploads/tv.png"
-        },
-        {
-            "id": 2,
-            "title": "Android Smartphone",
-            "price": 11499,
-             "old_price": 13999,
-            "discount_text": "18% OFF",
-            "image_url": "http://127.0.0.1:5000/uploads/mobile.png"
-        },
-        {
-            "id": 3,
-            "title": "Air Fryer",
-            "price": 4799,
-            "old_price": 5999,
-            "discount_text": "20% OFF",
-            "image_url": "http://127.0.0.1:5000/uploads/airfryer.png"
-        },
-        {
-            "id": 4,
-            "title": "Apple AirPods",
-            "price": 12499,
-            "old_price": 15999,
-            "discount_text": "22% OFF",
-            "image_url": "http://127.0.0.1:5000/uploads/airpods.png"
-              }
-    ]
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM deals")  # database table se fetch
+    deals = cursor.fetchall()
+
+    # image column ko full URL me convert karna
+    for deal in deals:
+        deal["image_url"] = f"http://localhost:5000/uploads/{deal['image']}"
+
     return jsonify(deals)
+    
 
 
 #mobilecatelog
 @app.route("/api/mobiles")
 def mobiles():
-    return jsonify([
-        {"id": 1,"name": "Samsung Galaxy S23","price": 69999,"image": "samsung.png"},
-        {"id": 2,"name": "iPhone 14",
-            "price": 79999,
-            "image": "apple.png"
-        },
-        {
-            "id": 3,
-            "name": "OnePlus 11",
-            "price": 47998,
-            "image": "oneplus.png"
-        },
-        {
-            "id": 4,
-            "name": "Oppo X9 5G",
-            "price": 56999,
-            "image": "oppo.png"
-        },
-        {
-            "id": 5,
-            "name": "redmi xi",
-            "price": 21999,
-            "image": "mi.png"
-        },
-        {
-            "id": 6,
-            "name": "realme NARZO 80",
-            "price": 12799,
-            "image": "realme.png"
-        },
-        {
-            "id": 7,
-            "name": "Vivo V300 ",
-            "price": 35799,
-            "image": "vivo.png"
-        },
-        {
-            "id": 8,
-            "name": "Motorola Edge 60 5G",
-            "price": 21998,
-            "image": "moto.png"
-        },
-        {
-            "id": 9,
-            "name": "Oppo Reno 14",
-            "price": 56999,
-            "image": "oppo5g.png"
-        },
-        {
-            "id": 10,
-            "name": "samsung Galaxy S25 Ultra 5G ",
-            "price": 129999,
-            "image": "sam1.png"
-        },
-        {
-            "id": 11,
-            "name": "POCO C71 ",
-            "price": 56999,
-            "image": "pococ71.jpeg"
-        },
-        {
-            "id": 12,
-            "name": "Pixel 8 Pro XL",
-            "price": 39999,
-            "image": "google.jpeg"
-        }
-    ])
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='mobile'")
+    mobiles = cursor.fetchall()
+
+    for m in mobiles:
+        m["image"] = f"http://localhost:5000/uploads/{m['image']}"
+
+    return jsonify(mobiles)
+    
+       
 # catelog
 @app.route("/api/products/<category>")
 def get_category_products(category):
@@ -189,13 +108,13 @@ def get_tvs():
     cursor = db.cursor(dictionary=True)
     cursor.execute("""
         SELECT id, name, price, image
-        FROM product
+        FROM products
         WHERE category = 'tv'
     """)
     tvs = cursor.fetchall()
 
     for tv in tvs:
-        tv["image"] = f"http://localhost:5000/uploads/{tv['image']}"
+        tv["image"] = f"http://localhost:5000/uploads/tv/{tv['image']}"
 
     return jsonify(tvs)
 
