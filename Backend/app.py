@@ -1,12 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import mysql.connector
-from flask import send_from_directory
 import os
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 # for image folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
@@ -16,7 +15,7 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
-    database="Electromart",
+    database="electromart",
     port=3307
 )
 
@@ -40,15 +39,26 @@ def admin_login():
 
     admin = cursor.fetchone()
 
-    if admin and admin["role"] == "admin":
-       return jsonify({
-        "success": True,
-        "role": "admin"
-    })
+    if admin:
+        return jsonify({
+            "success": True,
+            "role": admin["role"]
+        }), 200
     else:
-        return jsonify({"success": False}), 401
+        return jsonify({
+            "success": False,
+            "message": "Invalid email or password"
+        }), 401
     
     
+# is_trending
+@app.route("/api/trending")
+def trending():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE is_trending = 1")
+    data = cursor.fetchall()
+    return jsonify(data)
+
 
 
 # deals
@@ -57,7 +67,7 @@ def serve_image(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
-
+#deals
 @app.route("/api/deals", methods=["GET"])
 def get_deals():
     cursor = db.cursor(dictionary=True)
@@ -90,7 +100,7 @@ def mobiles():
 def get_category_products(category):
     cursor = db.cursor(dictionary=True)
     cursor.execute(
-        "SELECT id, name, price, image FROM product WHERE category=%s",
+        "SELECT id, name, price, image FROM products WHERE category=%s",
         (category,)
     )
     products = cursor.fetchall()
@@ -118,40 +128,92 @@ def get_tvs():
 
     return jsonify(tvs)
 
+# tablet
+@app.route("/api/tablets", methods=["GET"])
+def get_tablets():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='tablet'
+    """)
+    tablets = cursor.fetchall()
 
-#tvcatelog
-# @app.route("/api/tvs")
-# def get_tvs():
-#     return jsonify([
+    # image path fix
+    for tablet in tablets:
+        if tablet["image"]:
+            tablet["image"] = f"http://localhost:5000/uploads/tablet/{tablet['image']}"
 
-
-#   {
-#     "id": 201,
-#     "name": "OnePlus y Series smart Tv",
-#     "price": 38999,
-#     "image": "1+tv.jpg"
-#   },
-#   {
-#     "id": 202,
-#     "name": "LG 55 inch OLED Smart TV",
-#     "price": 89999,
-#     "image": "1plus led.png"
-#   },
-#   {
-#     "id": 203,
-#     "name": "Sony Bravia 50 inch 4K TV",
-#     "price": 62999,
-#     "image": "smart tv mi.jpg"
-#   },
-#   {
-#     "id": 204,
-#     "name": "OnePlus Y Series 43 inch TV",
-#     "price": 27999,
-#     "image": "1+tv.jpg"
-#   }
-# ])
+    return jsonify(tablets)
 
 
+# washing machines
+@app.route("/api/washingmachines", methods=["GET"])
+def get_washingmachines():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='washingmachine'
+    """)
+    machines = cursor.fetchall()
+
+    # Add image path
+    for machine in machines:
+        machine["image"] = f"http://localhost:5000/uploads/washingmachine/{machine['image']}"
+
+    return jsonify(machines)
+
+# laptops
+@app.route("/api/laptops", methods=["GET"])
+def get_laptops():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='laptop'
+    """)
+    laptops = cursor.fetchall()
+
+    # Add image path
+    for laptop in laptops:
+        laptop["image"] = f"http://localhost:5000/uploads/laptop/{laptop['image']}"
+
+    return jsonify(laptops)
+
+
+# earbuds
+@app.route("/api/earbuds", methods=["GET"])
+def get_earbuds():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='earbuds'
+    """)
+    earbuds = cursor.fetchall()
+
+    for earbud in earbuds:
+        earbud["image"] = f"http://localhost:5000/uploads/earbuds/{earbud['image']}"
+
+    return jsonify(earbuds)
+
+# smartwatches
+@app.route("/api/smartwatches", methods=["GET"])
+def get_smartwatches():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='smartwatch'
+    """)
+    smartwatches = cursor.fetchall()
+
+    # Add image path
+    for watch in smartwatches:
+        watch["image"] = f"http://localhost:5000/uploads/smartwatch/{watch['image']}"
+
+    return jsonify(smartwatches)
 
 # Add product API
 @app.route("/add-product", methods=["POST"])
@@ -165,12 +227,7 @@ def add_product():
     db.commit()
     return jsonify({"message": "Product added successfully"})
 
-# Get products
-# @app.route("/products")
-# def get_all_products():
-#     cursor = db.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM products")
-#     return jsonify(cursor.fetchall())
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
