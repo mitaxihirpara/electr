@@ -82,6 +82,109 @@ def get_deals():
     
 
 
+
+@app.route("/api/product/<int:id>")
+def get_product(id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, description, image, category
+        FROM products
+        WHERE id=%s
+    """, (id,))
+    product = cursor.fetchone()
+
+    if product and product["image"]:
+        category_folder_map = {
+            "mobile": "mobile",
+            "tv": "tv",
+            "Tablet": "tablet",
+            "earbuds": "earbuds",
+            "laptop": "laptop",
+            "washingmachine": "washingmachine",
+            "smartwatch": "smartwatch",
+            "Refrigerator": "refrigerator",
+            "Camera": "camera",
+            "ac": "ac",
+            "Computer": "computer","Speaker": "speaker","gamingconsole": "gamingconsole","smallaplliance": "smallappliance"
+
+        }
+
+        folder = category_folder_map.get(product["category"], "")
+        product["image"] = f"http://localhost:5000/uploads/{folder}/{product['image']}"
+
+    return jsonify(product)
+
+#smallappliances
+@app.route("/api/smallappliances", methods=["GET"])
+def get_small_appliances():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE category='smallaplliance'")
+    appliances = cursor.fetchall()
+
+    for product in appliances:
+        if product["image"]:
+            product["image"] = f"http://localhost:5000/uploads/smallappliance/{product['image']}"
+
+    return jsonify(appliances)
+
+
+
+#gaming console
+@app.route("/api/gamingconsoles", methods=["GET"])
+def get_gaming_consoles():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE category='gamingconsole'")
+    consoles = cursor.fetchall()
+
+    for product in consoles:
+        if product["image"]:
+            product["image"] = f"http://localhost:5000/uploads/gamingconsole/{product['image']}"
+
+    return jsonify(consoles)
+
+# speakers
+@app.route("/api/speakers", methods=["GET"])
+def get_speakers():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE category='speaker'")
+    speakers = cursor.fetchall()
+
+    for product in speakers:
+        if product["image"]:
+            product["image"] = f"http://localhost:5000/uploads/speaker/{product['image']}"
+
+    return jsonify(speakers)
+
+# computers
+@app.route("/api/computers", methods=["GET"])
+def get_computers():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE category = 'computer'")
+    computers = cursor.fetchall()
+
+    for product in computers:
+        if product["image"]:
+            product["image"] = f"http://localhost:5000/uploads/computer/{product['image']}"
+
+    return jsonify(computers)
+
+# refrigerator
+@app.route("/api/refrigerators", methods=["GET"])
+def get_refrigerators():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='Refrigerator'
+    """)
+    refrigerators = cursor.fetchall()
+
+    for fridge in refrigerators:
+        if fridge["image"]:
+            fridge["image"] = f"http://localhost:5000/uploads/refrigerator/{fridge['image']}"
+
+    return jsonify(refrigerators)
+
 #mobilecatelog
 @app.route("/api/mobiles")
 def mobiles():
@@ -90,7 +193,7 @@ def mobiles():
     mobiles = cursor.fetchall()
 
     for m in mobiles:
-        m["image"] = f"http://localhost:5000/uploads/{m['image']}"
+        m["image"] = f"http://localhost:5000/uploads/mobile/{m['image']}"
 
     return jsonify(mobiles)
     
@@ -128,6 +231,41 @@ def get_tvs():
 
     return jsonify(tvs)
 
+
+# ACs
+@app.route("/api/airconditioners", methods=["GET"])
+def get_airconditioners():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='ac'
+    """)
+    acs = cursor.fetchall()
+
+    for ac in acs:
+        if ac["image"]:
+            ac["image"] = f"http://localhost:5000/uploads/ac/{ac['image']}"
+
+    return jsonify(acs)
+
+# cameras
+@app.route("/api/cameras", methods=["GET"])
+def get_cameras():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT id, name, price, image
+        FROM products
+        WHERE category='camera'
+    """)
+    cameras = cursor.fetchall()
+
+    for camera in cameras:
+        if camera["image"]:
+            camera["image"] = f"http://localhost:5000/uploads/camera/{camera['image']}"
+
+    return jsonify(cameras)
+
 # tablet
 @app.route("/api/tablets", methods=["GET"])
 def get_tablets():
@@ -135,7 +273,7 @@ def get_tablets():
     cursor.execute("""
         SELECT id, name, price, image
         FROM products
-        WHERE category='tablet'
+        WHERE category='Tablet'
     """)
     tablets = cursor.fetchall()
 
