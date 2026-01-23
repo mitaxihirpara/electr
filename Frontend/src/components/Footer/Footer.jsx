@@ -6,6 +6,9 @@ import {
   faXTwitter,
   faYoutube
 } from "@fortawesome/free-brands-svg-icons";
+import { Link } from "react-router-dom";
+
+
 
 const Footer = () => {
   return (
@@ -17,27 +20,44 @@ const Footer = () => {
         <div>
           <h4>Product Categories</h4>
           <ul>
-            <li>Smartphones</li>
-            <li>Laptops</li>
-            <li>DSLR Cameras</li>
-            <li>Televisions</li>
+            
+          <li>
+            <Link to="/mobiles">Smartphones</Link>
+          </li>
+          <li>
+            <Link to="/tvs">Televisions</Link>
+          </li>
+          <li>
+            <Link to="/laptops">Laptops</Link>
+          </li>
+          <li>
+            <Link to="/cameras">DSLR Cameras</Link>
+          </li>
+      
+
             <li>Air Conditioners</li>
             <li>Refrigerators</li>
             <li>Kitchen Appliances</li>
             <li>Accessories</li>
-            <li>Personal Care & Grooming</li>
+        
           </ul>
         </div>
 
         <div>
           <h4>Site Info</h4>
           <ul>
-            <li>About ElectroMart</li>
-            <li>Services</li>
+            
+            <li><Link to="/about">About ElectroMart</Link></li>
+            <li><Link to="/services">Services</Link></li>
+          
+
             <li>Site Map</li>
             <li>Gift Cards</li>
             <li>Corporate Enquiries</li>
-            <li>Contact Us</li>
+            <li>
+            <Link to="/contact">Contact Us</Link>
+            </li>
+
           </ul>
         </div>
 
@@ -55,11 +75,11 @@ const Footer = () => {
         <div>
           <h4>Policies</h4>
           <ul>
-            <li>Terms of Use</li>
-            <li>FAQs</li>
-            <li>Cancellation & Returns</li>
+            <li> <Link to="/terms">Terms of Use</Link></li>
+            <li><Link to="/cancellation-returns">Cancellation & Returns</Link></li>
+            <li><Link to="/privacy">Privacy Policy</Link> </li>
             <li>Pricing & Payments</li>
-            <li>Privacy Policy</li>
+            <li>FAQs</li>
             <li>E-waste Recycling</li>
             <li>EMI & Cashback T&C</li>
             <li>Loyalty Program T&C</li>

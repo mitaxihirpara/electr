@@ -17,9 +17,8 @@ const Orders = () => {
           <li>My Profile</li>
           <li className="active">My Order</li>
           <li>Delivery Addresses</li>
-          <li>PAN & GST Information</li>
+          
           <li>ROne Loyalty Points</li>
-          <li>My Credit (Jio Wallet)</li>
           <li>My Wishlist</li>
         </ul>
       </aside>

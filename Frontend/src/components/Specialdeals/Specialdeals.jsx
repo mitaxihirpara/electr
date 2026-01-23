@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "./SpecialDeals.css";
 
 const SpecialDeals = () => {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetch("http://localhost:5000/api/deals")
@@ -49,14 +53,28 @@ const SpecialDeals = () => {
 
       <div className="deals-grid">
         {deals.map(deal => (
-          <div className="deal-card" key={deal.id}>
-            <img src={deal.image_url} alt={deal.title} />
-            <h3>{deal.title}</h3>
-            <p className="price">
-              ₹{deal.price} <span>₹{deal.old_price}</span>
-            </p>
-            <p className="discount">{deal.discount_text}</p>
-          </div>
+          // <div className="deal-card" key={deal.id}>
+          //   <img src={deal.image_url} alt={deal.title} />
+          //   <h3>{deal.title}</h3>
+          //   <p className="price">
+          //     ₹{deal.price} <span>₹{deal.old_price}</span>
+          //   </p>
+          //   <p className="discount">{deal.discount_text}</p>
+          // </div>
+          <div
+          className="deal-card"
+          key={deal.id}
+          onClick={() => navigate(`/${deal.category}`)}
+          style={{ cursor: "pointer" }}
+        >
+          <img src={deal.image_url} alt={deal.title} />
+          <h3>{deal.title}</h3>
+          <p className="price">
+            ₹{deal.price} <span>₹{deal.old_price}</span>
+          </p>
+          <p className="discount">{deal.discount_text}</p>
+        </div>
+
         ))}
       </div>
     </div>

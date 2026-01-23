@@ -1,0 +1,28 @@
+.services-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.services-container h1 {
+    margin-bottom: 15px;
+}
+
+.services-container .intro {
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.7;
+}
+
+.service-box {
+    margin-bottom: 25px;
+}
+
+.service-box h2 {
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.service-box p {
+    line-height: 1.6;
+}

@@ -1,0 +1,40 @@
+.gaming-console-page {
+    padding: 30px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #0a2c66;
+}
+
+
+/* 4 products per row – page specific */
+
+.gaming-console-page .gaming-console-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+    .gaming-console-page .gaming-console-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .gaming-console-page .gaming-console-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .gaming-console-page .gaming-console-grid {
+        grid-template-columns: 1fr;
+    }
+}

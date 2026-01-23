@@ -144,3 +144,13 @@
     color: #077eff;
     cursor: pointer;
 }
+
+.register-link {
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}

@@ -1,29 +1,78 @@
 import { useEffect, useState } from "react";
+import "./AdminProducts.css";
 
-function AdminProducts() {
+const AdminProducts = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // fetch all products
   useEffect(() => {
-    fetch("http://localhost:5000/products")
+    fetch("http://localhost:5000/api/products")
       .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(err => console.log(err));
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <div>
-      <h2>Admin Products</h2>
+  // delete product
+  const handleDelete = (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
 
-      {products.map(p => (
-        <div key={p.id}>
-          <p>Name: {p.name}</p>
-          <p>Price: ₹{p.price}</p>
-          <p>Stock: {p.stock}</p>
-          <hr />
-        </div>
-      ))}
+    fetch(`http://localhost:5000/api/products/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setProducts(products.filter(p => p.id !== id));
+      })
+      .catch(err => console.error(err));
+  };
+
+  if (loading) return <p>Loading products...</p>;
+
+  return (
+    <div className="admin-products">
+      <h2>Admin - Products</h2>
+
+      <table className="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {products.map(product => (
+            <tr key={product.id}>
+              <td>{product.id}</td>
+              <td>{product.name}</td>
+              <td>{product.category}</td>
+              <td>₹{product.price}</td>
+              <td>{product.stock}</td>
+              <td>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(product.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+
+      </table>
     </div>
   );
-}
+};
 
 export default AdminProducts;

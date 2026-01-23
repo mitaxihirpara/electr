@@ -1,0 +1,38 @@
+.catalog-container {
+    padding: 30px;
+}
+
+.catalog-container h2 {
+    margin-bottom: 20px;
+    color: #0a2c66;
+}
+
+
+/* 4 products per row */
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+
+/* responsive */
+
+@media (max-width: 1024px) {
+    .catalog-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}

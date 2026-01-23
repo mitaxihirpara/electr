@@ -1,0 +1,40 @@
+.computer-page {
+    padding: 30px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #0a2c66;
+}
+
+
+/* 4 products per row */
+
+.computer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+    .computer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .computer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .computer-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -5,25 +5,127 @@
     padding: 18px;
     text-align: center;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.product-card img {
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Image wrapper for fixed height */
+
+.image-wrapper {
     width: 100%;
     height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     display: block;
     background: #f5f5f5;
 }
 
+
+/* hover  */
+
+.image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #f5f5f5;
+    transition: transform 0.4s ease;
+    /* 👈 ADD */
+}
+
+
+/* 🔥 HOVER ZOOM EFFECT */
+
+.product-card:hover .image-wrapper img {
+    transform: scale(1.15);
+}
+
+
+/* Wishlist heart icon */
+
+
+/* Wishlist heart icon container */
+
 .wishlist-icon {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    font-size: 18px;
-    color: #e11d48;
-    cursor: pointer;
-    background: #fff;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    padding: 6px;
+    background: #fff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+
+/* Heart icon size */
+
+.wishlist-icon svg {
+    font-size: 14px;
+    /* ✅ SMALL HEART */
+    color: #999;
+}
+
+
+/* Active (liked) heart */
+
+.wishlist-icon.active svg {
+    color: #e11d48;
+}
+
+
+/* Product name */
+
+.product-card h3 {
+    font-size: 16px;
+    margin: 8px 0 4px;
+    color: #1f2937;
+}
+
+
+/* Price */
+
+.price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a58ca;
+    margin: 4px 0 10px;
+}
+
+
+/* Buttons */
+
+.buttons button {
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+    background-color: #f4b400;
 }

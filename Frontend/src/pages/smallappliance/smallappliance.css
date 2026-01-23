@@ -1,0 +1,40 @@
+.small-appliance-page {
+    padding: 30px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #0a2c66;
+}
+
+
+/* 4 products per row */
+
+.small-appliance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+    .small-appliance-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .small-appliance-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .small-appliance-grid {
+        grid-template-columns: 1fr;
+    }
+}

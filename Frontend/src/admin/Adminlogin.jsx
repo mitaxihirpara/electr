@@ -8,7 +8,7 @@ function AdminLogin() {
 
   const loginAdmin = async () => {
     try {
-      const res = await fetch("http://localhost:5000/admin/login", {  // make sure URL matches backend
+      const res = await fetch("http://localhost:5000/login", {  
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -20,8 +20,8 @@ function AdminLogin() {
 
       // Check if login succeeded and role is admin
       if (data.success && data.role === "admin") {
-        localStorage.setItem("admin", "true"); // save login
-        navigate("/admin"); // redirect to admin dashboard
+        localStorage.setItem("role", "admin"); // save login
+        navigate("/admin/dashboard"); // redirect to admin dashboard
       } else {
         alert("Invalid admin credentials or not authorized");
       }
