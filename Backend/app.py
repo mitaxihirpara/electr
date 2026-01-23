@@ -99,6 +99,40 @@ def register():
 
 
 
+#addproduct
+@app.route("/admin/add-product", methods=["POST"])
+def admin_add_product():
+    name = request.form.get("name")
+    price = request.form.get("price")
+    category = request.form.get("category")
+    stock = request.form.get("stock")
+    image = request.files.get("image")
+
+    if not all([name, price, category, stock, image]):
+        return jsonify({"message": "All fields required"}), 400
+
+    # folder create
+    folder_path = os.path.join(UPLOAD_FOLDER, category)
+    os.makedirs(folder_path, exist_ok=True)
+
+    image_path = os.path.join(folder_path, image.filename)
+    image.save(image_path)
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        INSERT INTO products (name, price, category, stock, image)
+        VALUES (%s,%s,%s,%s,%s)
+    """, (name, price, category, stock, image.filename))
+
+    db.commit()
+    db.close()
+
+    return jsonify({"success": True, "message": "Product added successfully"})
+
+
+
 
 
 @app.route("/change-password", methods=["POST"])
