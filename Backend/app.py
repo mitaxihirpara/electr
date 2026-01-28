@@ -156,6 +156,38 @@ def get_orders():
 
     return jsonify(orders)
 
+#search
+@app.route("/search-suggestions", methods=["GET"])
+def search_suggestions():
+    query = request.args.get("q", "").strip()
+
+    if not query:
+        return jsonify({"products": []}), 400
+
+    db = None
+    cursor = None
+
+    try:
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        # Fetch matching products (only name + id + optional slug or category)
+        sql = "SELECT id, name FROM products WHERE name LIKE %s LIMIT 10"
+        cursor.execute(sql, (f"%{query}%",))
+        products = cursor.fetchall()
+
+        return jsonify({"products": products}), 200
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"products": []}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
+
 
 @app.route("/change-password", methods=["POST"])
 def change_password():
