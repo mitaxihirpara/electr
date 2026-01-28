@@ -132,7 +132,29 @@ def admin_add_product():
     return jsonify({"success": True, "message": "Product added successfully"})
 
 
+#orders admin
+@app.route("/api/admin/orders", methods=["GET"])
+def get_orders():
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
 
+    cursor.execute("""
+        SELECT 
+            id,
+            customer_name,
+            total_amount,
+            payment_status,
+            order_status
+        FROM orders
+        ORDER BY id DESC
+    """)
+
+    orders = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(orders)
 
 
 @app.route("/change-password", methods=["POST"])

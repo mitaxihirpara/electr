@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 
@@ -105,43 +105,7 @@ const App = () => {
 
         {/* ADMIN LOGIN */}
         <Route path="/admin-login" element={<AdminLogin />} />
-        
-
-        {/* ADMIN PROTECTED ROUTES */}
-        {/* <Route
-          path="/admin/dashboard"
-          element={
-            role === "admin" ? (
-              <AdminDashboard />
-            ) : (
-              <Navigate to="/admin-login" />
-            )
-          }
-        />
-
-        <Route
-          path="/admin/products"
-          element={
-            role === "admin" ? (
-              <AdminProducts />
-            ) : (
-              <Navigate to="/admin-login" />
-            )
-          }
-        />
-        <Route
-        path="/admin/add-product"
-        element={role === "admin" ? <AddProduct /> : <Navigate to="/admin-login" />}
-      />
-
-      <Route
-        path="/admin/orders"
-        element={role === "admin" ? <AdminOrders /> : <Navigate to="/admin-login" />}
-      />
-
-        {/* FALLBACK */}
-        {/* <Route path="*" element={<Navigate to="/" />} />
-      </Routes> */} */
+      
          <Route
         path="/admin"
         element={role === "admin" ? <AdminLayout /> : <Navigate to="/admin-login" />
@@ -152,7 +116,7 @@ const App = () => {
         <Route path="products" element={<AdminProducts />} />
         <Route path="add-product" element={<AddProduct />} />
         <Route path="orders" element={<AdminOrders />} />
-         </Route>
+        </Route>
         
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
