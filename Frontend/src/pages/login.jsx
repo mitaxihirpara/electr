@@ -11,28 +11,26 @@ const Login = () => {
   const navigate = useNavigate();
 
   // ✅ LOGIN API
+
   const loginUser = async (email, password) => {
-    try {
-      const res = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.message === "Customer not registered") {
-          return { success: false, notRegistered: true };
-        }
-        return { success: false, message: data.message };
-      }
-
-      return { success: true, role: data.role };
-    } catch (err) {
-      return { success: false, message: "Backend server not running" };
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, message: data.message };
     }
-  };
+    return { success: true, ...data };
+
+  } catch (err) {
+    return { success: false, message: "Backend server not running" };
+  }
+};
+
 
   // ✅ REGISTER API
   const registerUser = async (username, email, password) => {
@@ -54,6 +52,7 @@ const Login = () => {
       return { success: false, message: "Backend server not running" };
     }
   };
+  
 
   // ✅ SUBMIT HANDLER
   const handleSubmit = async (e) => {
@@ -61,16 +60,33 @@ const Login = () => {
     setError("");
 
     if (currState === "Login") {
-      const result = await loginUser(email, password);
+  const result = await loginUser(email, password);
 
-      if (result.success) {
-        localStorage.setItem("role", result.role);
-        navigate(result.role === "admin" ? "/admin/dashboard" : "/");
-      } else if (result.notRegistered) {
-        setError("NOT_REGISTERED");
-      } else {
-        setError(result.message);
-      }
+  if (result.success) {
+
+    // 🔐 ADMIN LOGIN
+    if (result.type === "admin") {
+      localStorage.setItem("admin_id", result.admin_id);
+      localStorage.setItem("admin_name", result.admin_name);
+      localStorage.setItem("role", "admin"); 
+      navigate("/admin/dashboard");
+      return;
+    }
+
+    // 👤 CUSTOMER LOGIN
+    if (result.type === "customer") {
+      localStorage.setItem("customer_id", result.customer_id);
+      localStorage.setItem("customer_name", result.customer_name);
+      localStorage.setItem("role", "customer"); 
+      navigate("/");
+      return;
+    }
+
+  } else {
+    setError(result.message);
+  }
+
+
     } else {
       const result = await registerUser(username, email, password);
 
@@ -194,6 +210,6 @@ const Login = () => {
       </form>
     </div>
   );
+  
 };
-
 export default Login;

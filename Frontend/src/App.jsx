@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import {  Route, Routes, Navigate, useLocation } from "react-router-dom";
 
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
@@ -18,6 +18,10 @@ import Privacy from "./pages/Privacy/Privacy";
 import CancellationReturns from "./pages/Cancellation/cancellation";
 import ProductDetails from "./pages/Productdetails/Productdetails";
 import ForgotPassword from "./pages/ForgetPassword";
+import ProductDetail from "./pages/Productdetails/Productdetails";
+import BrandProducts from "./pages/BrandProducts";
+
+
 
 
 import MobileCatalog from "./pages/mobilecatelog";
@@ -45,6 +49,8 @@ import AdminProducts from "./admin/AdminProducts";
 import AddProduct from "./admin/AddProduct";
 import AdminOrders from "./admin/AdminOrder";
 import AdminLayout from "./admin/AdminLayout";
+import Customers from "./admin/Customers";
+import CustomerDetails from "./admin/Customerdetails";
 
 
 
@@ -61,6 +67,7 @@ const App = () => {
     
   return (
     <>
+      
       {!isAdminRoute && <Header />}
 
       <Routes>
@@ -95,11 +102,13 @@ const App = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/cancellation-returns" element={<CancellationReturns />} />
+        <Route path="/brand/:brand" element={<BrandProducts />} />
 
         
 
         <Route path="/wishlist" element={<Wishlist />}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        
         
   
 
@@ -116,12 +125,16 @@ const App = () => {
         <Route path="products" element={<AdminProducts />} />
         <Route path="add-product" element={<AddProduct />} />
         <Route path="orders" element={<AdminOrders />} />
+        <Route path="customers" element={<Customers />} />
+        <Route path="customers/:id" element={<CustomerDetails />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!isAdminRoute && <Footer />}
+    
     </>
+    
   );
 };
 

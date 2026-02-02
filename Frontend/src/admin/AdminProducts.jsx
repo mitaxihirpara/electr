@@ -20,19 +20,32 @@ const AdminProducts = () => {
   }, []);
 
   // delete product
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
+  // const handleDelete = (id) => {
+  //   if (!window.confirm("Are you sure you want to delete this product?")) return;
 
-    fetch(`http://localhost:5000/api/products/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setProducts(products.filter(p => p.id !== id));
-      })
-      .catch(err => console.error(err));
-  };
+  //   fetch(`http://localhost:5000/api/products/${id}`, {
+  //     method: "DELETE",
+  //   })
+  //     .then(() => {
+  //       setProducts(products.filter(p => p.id !== id));
+  //     })
+  //     .catch(err => console.error(err));
+  // };
 
   if (loading) return <p>Loading products...</p>;
+
+  const toggleStatus = (id, currentStatus) => {
+  fetch(`http://localhost:5000/api/products/${id}/status`, {
+    method: "PUT",
+  })
+    .then(res => res.json())
+    .then(() => {
+      setProducts(products.map(p => 
+        p.id === id ? { ...p, is_active: !currentStatus } : p
+      ));
+    })
+    .catch(err => console.error(err));
+};
 
   return (
     <div className="admin-products">
@@ -46,6 +59,7 @@ const AdminProducts = () => {
             <th>Category</th>
             <th>Price</th>
             <th>Stock</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -58,13 +72,15 @@ const AdminProducts = () => {
               <td>{product.category}</td>
               <td>₹{product.price}</td>
               <td>{product.stock}</td>
+                <td>{product.is_active ? "Active" : "Inactive"}</td>
+              
               <td>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(product.id)}
-                >
-                  Delete
-                </button>
+                 <button
+                    className={product.is_active ? "deactivate-btn" : "activate-btn"}
+                    onClick={() => toggleStatus(product.id, product.is_active)}
+                  >
+                    {product.is_active ? "Deactivate" : "Activate"}
+                  </button>
               </td>
             </tr>
           ))}

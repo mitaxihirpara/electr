@@ -1,0 +1,42 @@
+.brand-page {
+    padding: 20px;
+}
+
+.brand-page h2 {
+    margin-bottom: 20px;
+}
+
+.category-section {
+    margin-bottom: 30px;
+}
+
+.category-section h3 {
+    margin-bottom: 10px;
+    color: #0a2c66;
+}
+
+
+/* 🔥 Horizontal row */
+
+.product-row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 23%;
+    /* 4 cards in view */
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+
+
+/* Optional scrollbar styling */
+
+.product-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.product-row::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 10px;
+}

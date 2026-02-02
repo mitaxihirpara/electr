@@ -4,7 +4,7 @@ import mysql.connector
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
@@ -18,51 +18,73 @@ def get_db():
         port=3307
     )
 
+def get_category_id(slug):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT id FROM categories WHERE slug=%s", (slug,))
+    row = cur.fetchone()
+    cur.close()
+    db.close()
+    return row[0] if row else None
+
 @app.route("/")
 def home():
     return "Backend is running!"
 
 # ---------------- ADMIN LOGIN ------------
     
-
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.json
-    email = data.get("email")
-    password = data.get("password")
+    try:
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
 
-    # 1️⃣ check admin
-    cursor.execute(
-        "SELECT id FROM admin WHERE email=%s AND password=%s",
-        (email, password)
-    )
-    admin = cursor.fetchone()
+        # 🔐 Admin check
+        cursor.execute("""
+            SELECT id, name
+            FROM admin
+            WHERE email=%s AND password=%s
+        """, (email, password))
+        admin = cursor.fetchone()
 
-    if admin:
-        db.close()
-        return jsonify({"success": True, "role": "admin"})
+        if admin:
+            cursor.close()
+            conn.close()
+            return jsonify({
+                "type": "admin",
+                "admin_id": admin["id"],
+                "admin_name": admin["name"]
+            }), 200
 
-    # 2️⃣ check customer
-    cursor.execute(
-        "SELECT id FROM customers WHERE email=%s AND password=%s",
-        (email, password)
-    )
-    customer = cursor.fetchone()
+        # 👤 Customer check
+        cursor.execute("""
+            SELECT id, username
+            FROM customers
+            WHERE email=%s AND password=%s AND is_active=1
+        """, (email, password))
+        customer = cursor.fetchone()
 
-    db.close()
+        cursor.close()
+        conn.close()
 
-    if customer:
-        return jsonify({"success": True, "role": "customer"})
+        if customer:
+            return jsonify({
+                "type": "customer",
+                "customer_id": customer["id"],
+                "customer_name": customer["username"]
+            }), 200
 
-    # 3️⃣ new customer → register
-    return jsonify({
-        "success": False,
-        "register": True,
-        "message": "Customer not registered"
-    }), 404
+        # Invalid credentials
+        return jsonify({"message": "Invalid email or password"}), 401
+
+    except Exception as e:
+        print("LOGIN ERROR:", e)
+        return jsonify({"message": "Server error"}), 500
+
 
 
 #register
@@ -122,8 +144,8 @@ def admin_add_product():
     cursor = db.cursor()
 
     cursor.execute("""
-        INSERT INTO products (name, price, category, stock, image)
-        VALUES (%s,%s,%s,%s,%s)
+        INSERT INTO products (name, price, category,  category_id,stock, image)
+        VALUES (%s,%s,%s,%s,%s,%s)
     """, (name, price, category, stock, image.filename))
 
     db.commit()
@@ -131,6 +153,88 @@ def admin_add_product():
 
     return jsonify({"success": True, "message": "Product added successfully"})
 
+#admin manage customer 
+@app.route("/api/admin/customers", methods=["GET"])
+def get_customers():
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            id,
+            username,
+            email,
+            is_active
+        FROM customers
+        ORDER BY id DESC
+    """)
+    customers = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(customers)
+
+#ACTIVATE / DEACTIVATE API
+@app.route("/api/admin/customers/<int:id>/status", methods=["PUT"])
+def toggle_customer_status(id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE customers
+        SET is_active = NOT is_active
+        WHERE id = %s
+    """, (id,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Customer status updated"})
+
+#Admin – Get Single Customer
+@app.route("/api/admin/customers/<int:id>", methods=["GET"])
+def get_single_customer(id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            id,
+            username,
+            email,
+            is_active
+        FROM customers
+        WHERE id=%s
+    """, (id,))
+
+    customer = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(customer)
+
+#Admin – Activate / Deactivate Customer
+@app.route("/api/admin/customers/status", methods=["PUT"])
+def update_customer_status():
+    data = request.json
+    customer_id = data.get("id")
+    is_active = data.get("is_active")
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE customers
+        SET is_active=%s
+        WHERE id=%s
+    """, (is_active, customer_id))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"success": True, "message": "Customer status updated"})
 
 #orders admin
 @app.route("/api/admin/orders", methods=["GET"])
@@ -156,39 +260,151 @@ def get_orders():
 
     return jsonify(orders)
 
+#feedback
+@app.route("/api/feedback/<int:product_id>", methods=["GET"])
+def get_product_feedback(product_id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            id,
+            customer_name,
+            comment,
+            created_at
+        FROM feedback
+        WHERE id = %s
+        ORDER BY id DESC
+    """, (product_id,))
+
+    feedbacks = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(feedbacks)
+
+#addfeedback
+@app.route("/api/feedback", methods=["POST"])
+def add_feedback():
+    try:
+            data = request.json
+
+            conn = get_db()
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO feedback
+                (id, customer_name, comment)
+                VALUES (%s, %s, %s)
+            """, (
+                data["id"],
+                data.get("customer_name", "Guest"),
+                data["comment"]
+            ))
+
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({"message": "Feedback added successfully"}),201
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+#admin manage feedback
+@app.route("/api/admin/feedback", methods=["GET"])
+def get_all_feedback():
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            pf.id,
+            p.name AS product_name,
+            pf.customer_name,
+            pf.comment,
+            pf.created_at
+        FROM feedback pf
+        JOIN products p ON pf.product_id = p.id
+        ORDER BY pf.id DESC
+    """)
+
+    feedbacks = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(feedbacks)
+
+#deactivate product 
+@app.route("/api/products/<int:id>/status", methods=["PUT"])
+def toggle_product_status(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("""
+        UPDATE products
+        SET is_active = NOT is_active
+        WHERE id = %s
+    """, (id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    return jsonify({"message": "Product status updated"})
+
 #search
 @app.route("/search-suggestions", methods=["GET"])
 def search_suggestions():
     query = request.args.get("q", "").strip()
 
     if not query:
-        return jsonify({"products": []}), 400
+        return jsonify({"results": []})
 
-    db = None
-    cursor = None
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
 
     try:
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT 
+                p.id,
+                p.name,
+                'product' AS type,
+                c.slug
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.name LIKE %s
 
-        # Fetch matching products (only name + id + optional slug or category)
-        sql = "SELECT id, name FROM products WHERE name LIKE %s LIMIT 10"
-        cursor.execute(sql, (f"%{query}%",))
-        products = cursor.fetchall()
+            UNION
 
-        return jsonify({"products": products}), 200
+            SELECT 
+                c.id,
+                c.name,
+                'category' AS type,
+                c.slug
+            FROM categories c
+            WHERE c.name LIKE %s
+
+            LIMIT 10
+        """, (f"%{query}%", f"%{query}%"))
+
+        results = cursor.fetchall()
+        return jsonify({"results": results})
 
     except Exception as e:
-        print("Error:", e)
-        return jsonify({"products": []}), 500
+        print("Search error:", e)
+        return jsonify({"results": []}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-        if db:
-            db.close()
+        cursor.close()
+        db.close()
 
 
+
+
+#change password
 @app.route("/change-password", methods=["POST"])
 def change_password():
     data = request.json
@@ -260,20 +476,142 @@ def trending():
     db.close()
     return jsonify(products)
 
-# ---------------- DEALS ----------------
+
+#add_cart
+# @app.route("/api/cart/add", methods=["POST", "OPTIONS"])
+# def add_to_cart():
+#     if request.method == "OPTIONS":
+#         return jsonify({"status": "ok"}), 200
+
+#     data = request.get_json()
+
+#     user_id = data.get("user_id")
+#     product_id = data.get("product_id")
+
+#     conn = get_db()
+#     cursor = conn.cursor(dictionary=True)
+
+#     cursor.execute(
+#         "SELECT * FROM cart WHERE user_id=%s AND product_id=%s",
+#         (user_id, product_id)
+#     )
+#     item = cursor.fetchone()
+
+#     if item:
+#         cursor.execute(
+#             "UPDATE cart SET quantity = quantity + 1 WHERE id=%s",
+#             (item["id"],)
+#         )
+#     else:
+#         cursor.execute(
+#             "INSERT INTO cart (user_id, product_id, quantity) VALUES (%s,%s,1)",
+#             (user_id, product_id)
+#         )
+
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+
+#     return jsonify({"message": "Added to cart"}), 200
+
+@app.route("/api/cart/add", methods=["POST", "OPTIONS"])
+def add_to_cart():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+
+    data = request.get_json()
+
+    customer_id = int(data.get("user_id"))  # 🔥 MAP user_id → customer_id
+    product_id = int(data.get("product_id"))
+
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    # check already exists
+    cursor.execute(
+        "SELECT * FROM cart WHERE customer_id=%s AND product_id=%s",
+        (customer_id, product_id)
+    )
+    item = cursor.fetchone()
+
+    if item:
+        cursor.execute(
+            "UPDATE cart SET quantity = quantity + 1 WHERE id=%s",
+            (item["id"],)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO cart (customer_id, product_id, quantity) VALUES (%s,%s,1)",
+            (customer_id, product_id)
+        )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Added to cart"}), 200
+
+
+
+#fetch api
+
+@app.route("/api/cart/<int:user_id>")
+def get_cart(user_id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT cart.id, cart.quantity, products.name, products.price, products.image
+        FROM cart
+        JOIN products ON cart.product_id = products.id
+        WHERE cart.user_id = %s
+    """, (user_id,))
+
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(data)
+
+
+# ---------------- DEALS ---------------
+
 @app.route("/api/deals")
 def deals():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM deals")
-    deals = cursor.fetchall()
+    try:
+        # Join deals with products to get correct product info
+        cursor.execute("""
+            SELECT 
+                d.id as deal_id,
+                p.id as product_id,
+                p.name as title,
+                p.category,
+                p.price,
+                p.stock,
+                p.description,
+                p.image as image_filename,
+                d.discount_text
+            FROM deals d
+            JOIN products p ON d.product_id = p.id
+        """)
+        deals = cursor.fetchall()
 
-    for d in deals:
-        d["image_url"] = f"http://localhost:5000/uploads/{d['image']}"
+        for d in deals:
+            folder = d.get("category", "unknown")
+            d["image_url"] = f"http://localhost:5000/uploads/{folder}/{d['image_filename']}"
+        
+        return jsonify(deals)
 
-    db.close()
-    return jsonify(deals)
+    except Exception as e:
+        print("Deals API Error:", e)
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        db.close()
 
 # ---------------- GENERIC CATEGORY ----------------
 @app.route("/api/category/<category>")
@@ -297,7 +635,7 @@ def mobiles():
     cursor = db.cursor(dictionary=True)
 
     cursor.execute(
-        "SELECT id, name, price, image FROM products WHERE category='mobile'"
+        "SELECT id, name, price, image FROM products WHERE category='mobile'AND is_active=1"
     )
     mobiles = cursor.fetchall()
 
@@ -312,7 +650,7 @@ def tvs():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='tv'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='tv'AND is_active=1")
     tvs = cursor.fetchall()
 
     for tv in tvs:
@@ -326,7 +664,7 @@ def laptops():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='laptop'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='laptop'AND is_active=1")
     laptops = cursor.fetchall()
 
     for l in laptops:
@@ -340,7 +678,7 @@ def smartwatches():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='smartwatch'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='smartwatch'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -354,7 +692,7 @@ def small_appliances():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='smallaplliance'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='smallaplliance'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -368,7 +706,7 @@ def washing_machines():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='washingmachine'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='washingmachine'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -382,7 +720,7 @@ def refrigerators():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='refrigerator'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='refrigerator'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -396,7 +734,7 @@ def speakers():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='speaker'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='speaker'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -410,7 +748,7 @@ def computers():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='computer'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='computer'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -424,7 +762,7 @@ def tablets():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='tablet'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='tablet'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -438,7 +776,7 @@ def earbuds():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='earbuds'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='earbuds'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -452,7 +790,7 @@ def cameras():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='camera'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='camera'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -466,7 +804,7 @@ def airconditioners():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='ac'")
+    cursor.execute("SELECT id, name, price, image FROM products WHERE category='ac'AND is_active=1")
     items = cursor.fetchall()
 
     for p in items:
@@ -482,7 +820,7 @@ def gaming_consoles():
     cursor = db.cursor(dictionary=True)
 
     cursor.execute(
-        "SELECT id, name, price, image FROM products WHERE category='gamingconsole'"
+        "SELECT id, name, price, image FROM products WHERE category='gamingconsole'AND is_active=1"
     )
     products = cursor.fetchall()
 
@@ -526,16 +864,41 @@ def admin_get_products():
     db.close()
     return jsonify(products)
 
-@app.route("/api/products/<int:id>", methods=["DELETE"])
-def admin_delete_product(id):
-    db = get_db()
-    cursor = db.cursor()
 
-    cursor.execute("DELETE FROM products WHERE id=%s", (id,))
-    db.commit()
+#brands
+@app.route("/api/brand/<brand_name>")
+def brand_products(brand_name):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM products
+        WHERE brand=%s AND is_active=1
+    """, (brand_name,))
+
+    products = cursor.fetchall()
+
+    for p in products:
+        folder = p["category"]
+        p["image"] = f"http://localhost:5000/uploads/{folder}/{p['image']}"
 
     db.close()
-    return jsonify({"success": True})
+    return jsonify(products)
+
+
+
+
+
+# @app.route("/api/products/<int:id>", methods=["DELETE"])
+# def admin_delete_product(id):
+#     db = get_db()
+#     cursor = db.cursor()
+
+#     cursor.execute("DELETE FROM products WHERE id=%s", (id,))
+#     db.commit()
+
+#     db.close()
+#     return jsonify({"success": True})
 
 # ---------------- IMAGE SERVE ----------------
 @app.route("/uploads/<path:filename>")

@@ -1,0 +1,118 @@
+/* COMMON ADMIN CONTAINER */
+
+.admin-container {
+    padding: 25px;
+    background: #f4f6f9;
+    min-height: 100vh;
+}
+
+.admin-container h2 {
+    margin-bottom: 20px;
+    color: #0a2c66;
+}
+
+
+/* TABLE */
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table th {
+    background: #0a2c66;
+    color: #fff;
+}
+
+.admin-table tr:hover {
+    background: #f1f3f6;
+}
+
+
+/* STATUS BADGES */
+
+.active {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.inactive {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+
+/* BUTTONS */
+
+button {
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+}
+
+.btn-view {
+    background: #3498db;
+    color: #fff;
+    padding: 6px 10px;
+    margin-right: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-deactivate {
+    background: #e74c3c;
+    color: #fff;
+    padding: 6px 10px;
+    margin-left: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-activate {
+    background: #2ecc71;
+    color: #fff;
+    padding: 6px 10px;
+    margin-left: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-view:hover,
+.btn-deactivate:hover,
+.btn-activate:hover {
+    opacity: 0.85;
+}
+
+
+/* CUSTOMER DETAILS CARD */
+
+.detail-card {
+    background: #fff;
+    padding: 20px;
+    max-width: 500px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detail-card p {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+
+/* BACK BUTTON */
+
+.admin-container button:first-child {
+    margin-bottom: 15px;
+    background: transparent;
+    color: #0a2c66;
+    font-weight: bold;
+}

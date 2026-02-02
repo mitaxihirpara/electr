@@ -53,18 +53,13 @@ const SpecialDeals = () => {
 
       <div className="deals-grid">
         {deals.map(deal => (
-          // <div className="deal-card" key={deal.id}>
-          //   <img src={deal.image_url} alt={deal.title} />
-          //   <h3>{deal.title}</h3>
-          //   <p className="price">
-          //     ₹{deal.price} <span>₹{deal.old_price}</span>
-          //   </p>
-          //   <p className="discount">{deal.discount_text}</p>
-          // </div>
+          
           <div
           className="deal-card"
           key={deal.id}
-          onClick={() => navigate(`/${deal.category}`)}
+         onClick={() => navigate(`/product/${deal.product_id}`)}
+
+
           style={{ cursor: "pointer" }}
         >
           <img src={deal.image_url} alt={deal.title} />

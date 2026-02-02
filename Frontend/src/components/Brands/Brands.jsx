@@ -1,5 +1,6 @@
 import React from "react";
 import "./Brands.css";
+import { useNavigate } from "react-router-dom";
 import assets from "../../assets/assets";
 
 const brands = [
@@ -15,21 +16,25 @@ const brands = [
   { name: "Dell", logo: "https://upload.wikimedia.org/wikipedia/commons/1/18/Dell_logo_2016.svg" },
   { name: "Sony", logo: assets.sony},
   { name: "Lenovo", logo: assets.lenovo},
-  { name: "Asus", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg" },
-  { name: "Acer", logo: assets.acer },
-  { name: "Xiaomi", logo: "https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg" }
+  { name: "Asus", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg" }
+
+
  
 ];
 
 
 const BrandsBar = () => {
+    const navigate = useNavigate();
   return (
     <div className="brands-section">
       <h2>Top Brands</h2>
 
       <div className="brands-bar">
         {brands.map((brand, index) => (
-          <div className="brand-card" key={index}>
+          <div className="brand-card" key={index}
+          onClick={() => navigate(`/brand/${brand.name}`)}
+
+          >
             <img src={brand.logo} alt={brand.name} />
           </div>
         ))}

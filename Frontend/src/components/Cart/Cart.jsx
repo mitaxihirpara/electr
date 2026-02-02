@@ -1,26 +1,31 @@
-import React from "react";
-import "./Cart.css";
+import { useEffect, useState } from "react";
 
 const Cart = () => {
+  const [cart, setCart] = useState([]);
+  const customerId = localStorage.getItem("customer_id");
+
+    if (!customerId) {
+  return <h3>Please login to view cart</h3>;
+}
+
+  useEffect(() => {
+   fetch(`http://localhost:5000/api/cart/${customerId}`)
+      .then(res => res.json())
+      .then(data => setCart(data));
+  }, []);
+
   return (
-    <div className="cart-page">
-      <h2 className="cart-title">My Cart</h2>
+    <div>
+      <h2>My Cart</h2>
 
-      <div className="empty-cart-card">
-        <div className="cart-icon">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
-            alt="Empty Cart"
-          />
+      {cart.map(item => (
+        <div key={item.id}>
+          <img src={item.image} width="80" />
+          <h4>{item.name}</h4>
+          <p>₹{item.price}</p>
+          <p>Qty: {item.quantity}</p>
         </div>
-
-        <h3>Empty Cart</h3>
-        <p>Browse items and add them to your cart</p>
-
-        <button className="continue-btn">
-          Continue Shopping
-        </button>
-      </div>
+      ))}
     </div>
   );
 };

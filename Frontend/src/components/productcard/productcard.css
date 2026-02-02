@@ -129,3 +129,17 @@
 .buttons button:hover {
     background-color: #f4b400;
 }
+
+.add-cart-btn {
+    background: #ff9f00;
+    border: none;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.add-cart-btn:hover {
+    background: #fb641b;
+}

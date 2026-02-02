@@ -1,0 +1,33 @@
+.feedback-container {
+    margin-top: 40px;
+}
+
+.feedback-container textarea {
+    width: 100%;
+    height: 90px;
+    padding: 10px;
+    resize: none;
+}
+
+.feedback-container button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #0a2c66;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.feedback-list {
+    margin-top: 20px;
+}
+
+.feedback-card {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.feedback-card span {
+    font-size: 12px;
+    color: gray;
+}

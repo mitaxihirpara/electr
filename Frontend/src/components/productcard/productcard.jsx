@@ -6,24 +6,43 @@ import "./productcard.css";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
+
+if (!product) return null; 
+
   const [liked, setLiked] = useState(false);
   const navigate = useNavigate();
 
+  
+  const handleAddToCart = async () => {
+  const userId = localStorage.getItem("customer_id"); 
 
-  //  image URL handling
+
+  if (!userId) {
+    alert("Please login first");
+    return;
+  }
+
+  await fetch("http://localhost:5000/api/cart/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      product_id: product.id
+    })
+  });
+
+  alert("Added to cart 🛒");
+};
+
+  
    const imageSrc = product.image;
-  // .startsWith("http")
-  //   ? product.image
-  //   : `http://localhost:5000/uploads/${product.image}`;
 
   return (
     <div className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
       
-
-
-      {/* Wishlist icon */}
-      {/* <span className="wishlist-icon" onClick={() => setLiked(!liked)}> */}
-      <span
+        <span
         className="wishlist-icon"
         onClick={(e) => {
           e.stopPropagation();
@@ -50,15 +69,19 @@ const ProductCard = ({ product }) => {
       <p className="price">₹{product.price}</p>
 
       {/* Buttons */}
-      <div className="buttons">
-        <button>Add to Cart</button>
-        {/* <button>Wishlist</button> */}
-      </div>
+          <button
+        className="add-cart-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleAddToCart();
+        }}
+      >
+        Add to Cart
+      </button>
 
-      {/* Optional: Stock info */}
-      {/* {product.stock !== undefined && (
-        <p className="stock">{product.stock > 0 ? "In Stock" : "Out of Stock"}</p>
-      )} */}
+
+
+     
     </div>
   );
 };

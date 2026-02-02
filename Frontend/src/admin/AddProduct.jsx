@@ -6,6 +6,7 @@ const AddProduct = () => {
     name: "",
     price: "",
     category: "",
+    brand: "",
     stock: ""
   });
 
@@ -19,7 +20,15 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.price || !form.category || !form.stock || !image) {
+
+     const stockValue = Number(form.stock);
+
+
+  if (stockValue < 1 || stockValue > 1000) {
+    alert("Stock must be between 1 and 1000");
+    return;
+  }
+    if (!form.name || !form.price || !form.category || !form.brand || !form.stock || !image) {
       alert("Please fill all fields");
       return;
     }
@@ -84,6 +93,25 @@ const AddProduct = () => {
             />
           </div>
         </div>
+
+        <div className="form-group">
+        <label>Brand</label>
+        <select name="brand" value={form.brand} onChange={handleChange}>
+          <option value="">Select Brand</option>
+          <option value="Apple">Apple</option>
+          <option value="Samsung">Samsung</option>
+          <option value="LG">LG</option>
+          <option value="Sony">Sony</option>
+          <option value="Dell">Dell</option>
+          <option value="HP">HP</option>
+          <option value="Lenovo">Lenovo</option>
+          <option value="Asus">Asus</option>
+          <option value="OnePlus">OnePlus</option>
+          <option value="Oppo">Oppo</option>
+          <option value="Vivo">Vivo</option>
+        </select>
+      </div>
+
 
         <div className="form-group">
           <label>Category</label>
