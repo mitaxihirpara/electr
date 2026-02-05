@@ -1,61 +1,101 @@
-import React, { useEffect, useState } from "react";
-import "./AdminOrders.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const AdminOrders = () => {
+function AdminOrders() {
+  // console.log("🔥 AdminOrders component loaded");
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/admin/orders",
+        {
+    headers: {
+       role: "admin"
+      }
+  }
+      );
+      console.log("🔥 AdminOrders responses:",res.data);
+
+      setOrders(res.data || []);
+    } catch (err) {
+      console.error("Admin orders error:", err);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/admin/orders")
-      .then(res => res.json())
-      .then(data => {
-        setOrders(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    fetchOrders();
   }, []);
 
-  if (loading) {
-    return <div className="loading">Loading orders...</div>;
-  }
+  const changeStatus = async (orderId, status) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/admin/order-status/${orderId}`,
+        { status }
+      );
+      fetchOrders();
+    } catch (err) {
+      console.error("Status update error:", err);
+    }
+  };
+
+  if (loading) return <p>Loading orders...</p>;
 
   return (
-    <div className="orders-container">
-      <h2>🧾 Orders</h2>
+    
+    <div style={{ padding: 20 }}>
+      <h2>Admin – Manage Orders</h2>
 
       {orders.length === 0 ? (
-        <div className="empty-state">
-          <p>No orders found</p>
-        </div>
+        <p>No orders found</p>
       ) : (
-        <table className="orders-table">
+        <table border="1" cellPadding="10" width="100%">
           <thead>
             <tr>
-              <th>Order ID</th>
+              <th>ID</th>
               <th>Customer</th>
               <th>Total</th>
-              <th>Payment</th>
               <th>Status</th>
-              <th>Action</th>
+              <th>Manage</th>
             </tr>
           </thead>
+
           <tbody>
             {orders.map(order => (
-              <tr key={order.id}>
+              <tr key={order.order_id}>
                 <td>{order.id}</td>
                 <td>{order.customer_name}</td>
                 <td>₹{order.total_amount}</td>
-                <td>{order.payment_status}</td>
+                <td>{order.order_status}</td>
+
                 <td>
-                  <span className={`status ${order.order_status}`}>
-                    {order.order_status}
-                  </span>
-                </td>
-                <td>
-                  <button className="view-btn">View</button>
+                  <select
+                    value={order.order_status}
+                    onChange={e =>
+                      changeStatus(order.order_id, e.target.value)
+                    }
+                  >
+                    <option value="PLACED">PLACED</option>
+                    <option value="SHIPPED">SHIPPED</option>
+                    <option value="DELIVERED">DELIVERED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
+
+                  <button
+                    style={{ marginLeft: 10 }}
+                    onClick={() =>
+                      navigate(`/admin/order/${order.order_id}`)
+                    }
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
@@ -64,6 +104,6 @@ const AdminOrders = () => {
       )}
     </div>
   );
-};
+}
 
 export default AdminOrders;

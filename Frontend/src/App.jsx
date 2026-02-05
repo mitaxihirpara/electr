@@ -20,7 +20,9 @@ import ProductDetails from "./pages/Productdetails/Productdetails";
 import ForgotPassword from "./pages/ForgetPassword";
 import ProductDetail from "./pages/Productdetails/Productdetails";
 import BrandProducts from "./pages/BrandProducts";
-
+import Checkout from "./pages/checkout";
+import OrderDetails from "./pages/OrderDetails";
+import OrderTracking from "./components/OrderTracking";
 
 
 
@@ -51,14 +53,14 @@ import AdminOrders from "./admin/AdminOrder";
 import AdminLayout from "./admin/AdminLayout";
 import Customers from "./admin/Customers";
 import CustomerDetails from "./admin/Customerdetails";
-
+import AdminOrderDetails from './admin/AdminOrderDetails';
 
 
 
 const App = () => {
   const role = localStorage.getItem("role");
   const location = useLocation();
-  
+ 
 
   // Hide header/footer on admin pages
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -103,8 +105,8 @@ const App = () => {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/cancellation-returns" element={<CancellationReturns />} />
         <Route path="/brand/:brand" element={<BrandProducts />} />
-
-        
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders/:id" element={<OrderDetails />} />
 
         <Route path="/wishlist" element={<Wishlist />}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -127,6 +129,7 @@ const App = () => {
         <Route path="orders" element={<AdminOrders />} />
         <Route path="customers" element={<Customers />} />
         <Route path="customers/:id" element={<CustomerDetails />} />
+        <Route path="/admin/order/:orderId" element={<AdminOrderDetails />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" />} />

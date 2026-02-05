@@ -33,12 +33,16 @@ const Footer = () => {
           <li>
             <Link to="/cameras">DSLR Cameras</Link>
           </li>
+          <li>
+            <Link to="/refrigerators">Refrigerators</Link>
+          </li><li>
+            <Link to="/airconditioners">Air Conditioners</Link>
+          </li><li>
+            <Link to="/small-appliances">Kitchen Appliances</Link>
+          </li><li>
+            <Link to="/subcategory">Accessories</Link>
+          </li>
       
-
-            <li>Air Conditioners</li>
-            <li>Refrigerators</li>
-            <li>Kitchen Appliances</li>
-            <li>Accessories</li>
         
           </ul>
         </div>

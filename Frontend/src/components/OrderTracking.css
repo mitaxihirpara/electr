@@ -1,0 +1,62 @@
+.tracking-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    max-width: 600px;
+}
+
+.tracking-steps {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    background-color: white;
+    z-index: 1;
+}
+
+.circle.active {
+    background-color: #4caf50;
+    color: white;
+    border-color: #4caf50;
+}
+
+.line {
+    width: 60px;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
+span {
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+span.active {
+    font-weight: bold;
+    color: #4caf50;
+}
+
+.cancelled p {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}

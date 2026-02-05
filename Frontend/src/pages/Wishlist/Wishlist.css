@@ -11,6 +11,9 @@
     color: #111;
 }
 
+
+/* Empty wishlist card */
+
 .empty-wishlist-card {
     max-width: 500px;
     margin: 0 auto;
@@ -53,4 +56,80 @@
 
 .continue-btn:hover {
     background-color: #084298;
+}
+
+
+/* Wishlist grid layout */
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+
+/* Individual card */
+
+.wishlist-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    padding: 15px;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.wishlist-image {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.wishlist-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: transform 0.4s ease;
+}
+
+.wishlist-card:hover .wishlist-image img {
+    transform: scale(1.1);
+}
+
+
+/* Remove heart icon */
+
+.remove-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    color: #e11d48;
+    font-size: 14px;
+}
+
+.wishlist-card h3 {
+    font-size: 16px;
+    margin: 8px 0 4px;
+    color: #1f2937;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a58ca;
 }

@@ -3,8 +3,14 @@ from flask_cors import CORS
 import mysql.connector
 import os
 
-app = Flask(__name__)
-CORS(app, supports_credentials=True)
+# app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="uploads",
+    static_url_path="/uploads"
+)
+CORS(app)
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
@@ -120,38 +126,6 @@ def register():
     return jsonify({"success": True, "message": "Registration successful"}), 201
 
 
-
-#addproduct
-@app.route("/admin/add-product", methods=["POST"])
-def admin_add_product():
-    name = request.form.get("name")
-    price = request.form.get("price")
-    category = request.form.get("category")
-    stock = request.form.get("stock")
-    image = request.files.get("image")
-
-    if not all([name, price, category, stock, image]):
-        return jsonify({"message": "All fields required"}), 400
-
-    # folder create
-    folder_path = os.path.join(UPLOAD_FOLDER, category)
-    os.makedirs(folder_path, exist_ok=True)
-
-    image_path = os.path.join(folder_path, image.filename)
-    image.save(image_path)
-
-    db = get_db()
-    cursor = db.cursor()
-
-    cursor.execute("""
-        INSERT INTO products (name, price, category,  category_id,stock, image)
-        VALUES (%s,%s,%s,%s,%s,%s)
-    """, (name, price, category, stock, image.filename))
-
-    db.commit()
-    db.close()
-
-    return jsonify({"success": True, "message": "Product added successfully"})
 
 #admin manage customer 
 @app.route("/api/admin/customers", methods=["GET"])
@@ -273,7 +247,7 @@ def get_product_feedback(product_id):
             comment,
             created_at
         FROM feedback
-        WHERE id = %s
+        WHERE product_id = %s
         ORDER BY id DESC
     """, (product_id,))
 
@@ -284,35 +258,36 @@ def get_product_feedback(product_id):
 
     return jsonify(feedbacks)
 
-#addfeedback
 @app.route("/api/feedback", methods=["POST"])
 def add_feedback():
     try:
-            data = request.json
+        data = request.json
 
-            conn = get_db()
-            cursor = conn.cursor()
+        if not data.get("customer_id"):
+            return jsonify({"message": "Login required"}), 401
 
-            cursor.execute("""
-                INSERT INTO feedback
-                (id, customer_name, comment)
-                VALUES (%s, %s, %s)
-            """, (
-                data["id"],
-                data.get("customer_name", "Guest"),
-                data["comment"]
-            ))
+        conn = get_db()
+        cursor = conn.cursor()
 
-            conn.commit()
+        cursor.execute("""
+            INSERT INTO feedback (product_id, customer_id, customer_name, comment)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data["product_id"],
+            data["customer_id"],
+            data["customer_name"],
+            data["comment"]
+        ))
 
-            cursor.close()
-            conn.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-            return jsonify({"message": "Feedback added successfully"}),201
+        return jsonify({"message": "Feedback added successfully"}), 201
 
     except Exception as e:
         print("ERROR:", e)
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Server error"}), 500
 
 
 #admin manage feedback
@@ -339,6 +314,196 @@ def get_all_feedback():
     conn.close()
 
     return jsonify(feedbacks)
+
+
+# ---------------- CART ----------------
+
+@app.route("/api/cart/<int:user_id>", methods=["GET"])
+def get_cart(user_id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            cart.id AS cart_id,
+            cart.quantity,
+            p.id AS product_id,
+            p.name,
+            p.price,
+            p.category,
+            p.image
+        FROM cart
+        JOIN products p ON cart.product_id = p.id
+        WHERE cart.customer_id = %s
+    """, (user_id,))
+
+    cart_items = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    for item in cart_items:
+        folder = item["category"]
+        if folder == "smallaplliance":
+            folder = "smallappliance"
+
+        item["image_url"] = f"http://localhost:5000/uploads/{folder}/{item['image']}"
+
+    total_count = sum(item["quantity"] for item in cart_items)
+
+    return jsonify({
+        "cart_items": cart_items,
+        "total_count": total_count
+    })
+
+
+@app.route("/api/cart/add", methods=["POST"])
+def add_to_cart():
+    data = request.get_json()
+    customer_id = int(data["user_id"])
+    product_id = int(data["product_id"])
+
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT id FROM cart WHERE customer_id=%s AND product_id=%s",
+        (customer_id, product_id)
+    )
+    item = cursor.fetchone()
+
+    if item:
+        cursor.execute(
+            "UPDATE cart SET quantity = quantity + 1 WHERE id=%s",
+            (item["id"],)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO cart (customer_id, product_id, quantity) VALUES (%s,%s,1)",
+            (customer_id, product_id)
+        )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Added to cart"}), 200
+
+
+@app.route("/api/cart/update", methods=["POST"])
+def update_cart():
+    data = request.get_json()
+    cart_id = int(data["cart_id"])
+    action = data["action"]
+
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT quantity FROM cart WHERE id=%s", (cart_id,))
+    item = cursor.fetchone()
+
+    if not item:
+        return jsonify({"message": "Item not found"}), 404
+
+    qty = item["quantity"]
+
+    if action == "increment":
+        qty += 1
+    elif action == "decrement":
+        qty -= 1
+
+    if qty <= 0:
+        cursor.execute("DELETE FROM cart WHERE id=%s", (cart_id,))
+    else:
+        cursor.execute("UPDATE cart SET quantity=%s WHERE id=%s", (qty, cart_id))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Cart updated"})
+
+
+@app.route("/api/cart/remove/<int:cart_id>", methods=["DELETE"])
+def remove_cart_item(cart_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cart WHERE id=%s", (cart_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Item removed"})
+
+#subcategory
+@app.route("/categories")
+def get_categories():
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+    cur.execute("SELECT * FROM categories")
+    return jsonify(cur.fetchall())
+
+@app.route("/subcategories/<int:category_id>")
+def get_subcategories(category_id):
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+    cur.execute(
+        "SELECT * FROM subcategories WHERE category_id=%s",
+        (category_id,)
+    )
+    return jsonify(cur.fetchall())
+
+
+
+#add_product
+@app.route("/admin/add-product", methods=["POST"])
+def add_product():
+    name = request.form.get("name")
+    price = request.form.get("price")
+    stock = request.form.get("stock")
+    brand = request.form.get("brand")
+    category_id = request.form.get("category_id")
+    subcategory_id = request.form.get("subcategory_id")
+    image = request.files.get("image")
+
+    if not all([name, price, stock, brand, category_id, subcategory_id, image]):
+        return jsonify({"message": "All fields required"}), 400
+
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    # validate subcategory belongs to category
+    cur.execute(
+        "SELECT category_id FROM subcategories WHERE id=%s",
+        (subcategory_id,)
+    )
+    sub = cur.fetchone()
+
+    if not sub or str(sub["category_id"]) != str(category_id):
+        cur.close()
+        db.close()
+        return jsonify({"message": "Category & SubCategory mismatch"}), 400
+
+
+        # get category slug/name using category_id
+    cur.execute("SELECT slug FROM categories WHERE id=%s", (category_id,))
+    cat = cur.fetchone()
+    category = cat["slug"] if cat else None
+
+    filename = image.filename
+    image.save(os.path.join(UPLOAD_FOLDER, filename))
+
+    cur = db.cursor()
+    cur.execute("""
+        INSERT INTO products
+        (name, price, stock, brand,category, category_id, subcategory_id, image)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (name, price, stock, brand, category, category_id, subcategory_id, filename))
+
+    db.commit()
+    cur.close()
+    db.close()
+
+    return jsonify({"message": "Product added successfully"}), 200
+
 
 #deactivate product 
 @app.route("/api/products/<int:id>/status", methods=["PUT"])
@@ -477,101 +642,6 @@ def trending():
     return jsonify(products)
 
 
-#add_cart
-# @app.route("/api/cart/add", methods=["POST", "OPTIONS"])
-# def add_to_cart():
-#     if request.method == "OPTIONS":
-#         return jsonify({"status": "ok"}), 200
-
-#     data = request.get_json()
-
-#     user_id = data.get("user_id")
-#     product_id = data.get("product_id")
-
-#     conn = get_db()
-#     cursor = conn.cursor(dictionary=True)
-
-#     cursor.execute(
-#         "SELECT * FROM cart WHERE user_id=%s AND product_id=%s",
-#         (user_id, product_id)
-#     )
-#     item = cursor.fetchone()
-
-#     if item:
-#         cursor.execute(
-#             "UPDATE cart SET quantity = quantity + 1 WHERE id=%s",
-#             (item["id"],)
-#         )
-#     else:
-#         cursor.execute(
-#             "INSERT INTO cart (user_id, product_id, quantity) VALUES (%s,%s,1)",
-#             (user_id, product_id)
-#         )
-
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
-
-#     return jsonify({"message": "Added to cart"}), 200
-
-@app.route("/api/cart/add", methods=["POST", "OPTIONS"])
-def add_to_cart():
-    if request.method == "OPTIONS":
-        return jsonify({"ok": True}), 200
-
-    data = request.get_json()
-
-    customer_id = int(data.get("user_id"))  # 🔥 MAP user_id → customer_id
-    product_id = int(data.get("product_id"))
-
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-
-    # check already exists
-    cursor.execute(
-        "SELECT * FROM cart WHERE customer_id=%s AND product_id=%s",
-        (customer_id, product_id)
-    )
-    item = cursor.fetchone()
-
-    if item:
-        cursor.execute(
-            "UPDATE cart SET quantity = quantity + 1 WHERE id=%s",
-            (item["id"],)
-        )
-    else:
-        cursor.execute(
-            "INSERT INTO cart (customer_id, product_id, quantity) VALUES (%s,%s,1)",
-            (customer_id, product_id)
-        )
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({"message": "Added to cart"}), 200
-
-
-
-#fetch api
-
-@app.route("/api/cart/<int:user_id>")
-def get_cart(user_id):
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT cart.id, cart.quantity, products.name, products.price, products.image
-        FROM cart
-        JOIN products ON cart.product_id = products.id
-        WHERE cart.user_id = %s
-    """, (user_id,))
-
-    data = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    return jsonify(data)
 
 
 # ---------------- DEALS ---------------
@@ -904,6 +974,427 @@ def brand_products(brand_name):
 @app.route("/uploads/<path:filename>")
 def serve_image(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+
+
+
+#orders
+@app.route("/api/orders/<int:customer_id>")
+def get_cust_orders(customer_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+           SELECT 
+            o.id AS order_id,
+            o.customer_name,
+            o.total_amount,
+            o.payment_method,
+            o.order_status,
+            o.order_date,
+            od.product_id,
+            od.product_name,
+            od.quantity,
+            p.image,
+            p.category
+        FROM orders o
+        JOIN order_details od ON o.id = od.order_id
+        JOIN products p ON od.product_id = p.id
+        WHERE o.customer_id = %s
+        ORDER BY o.order_date DESC   
+    """, (customer_id,)) 
+    rows = cursor.fetchall()
+
+    # group by order_id
+    orders = {}
+    for row in rows:
+        oid = row["order_id"]
+        if oid not in orders:
+            orders[oid] = {
+                "id": oid,
+                "customer_name": row["customer_name"],
+                "total_amount": row["total_amount"],
+                "payment_method": row["payment_method"],
+                "order_status": row["order_status"],
+                "order_date": row["order_date"],
+                "products": []
+            }
+            folder = row["category"]
+            if folder == "smallaplliance":
+                    folder = "smallappliance"
+
+            image_url = f"http://localhost:5000/uploads/{folder}/{row['image']}"
+  
+        # image_url = f"http://localhost:5000/uploads/{row['category']}/{row['image']}"
+        orders[oid]["products"].append({
+            "name": row["product_name"],
+            "quantity": row["quantity"],
+            "image": image_url
+        })
+
+    cursor.close()
+    db.close()
+
+    return jsonify({"orders": list(orders.values())})
+
+       
+
+#update order 
+# @app.route("/api/admin/order/status", methods=["PUT"])
+# def update_order_status():
+#     data = request.json
+#     order_id = data.get("order_id")
+#     status = data.get("status")
+
+#     if status not in ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"]:
+#         return jsonify({"message": "Invalid status"}), 400
+
+#     db = get_db()
+#     cursor = db.cursor()
+
+#     cursor.execute("""
+#         UPDATE orders
+#         SET order_status=%s
+#         WHERE id=%s
+#     """, (status, order_id))
+
+    # db.commit()
+    # cursor.close()
+    # db.close()
+
+    # return jsonify({"message": "Order status updated"})
+
+
+#cancel order customer 
+@app.route("/api/orders/cancel/<int:order_id>", methods=["PUT"])
+def cancel_order(order_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT order_status FROM orders WHERE id=%s", (order_id,))
+    order = cursor.fetchone()
+
+    if not order:
+        return jsonify({"message": "Order not found"}), 404
+
+    if order["order_status"] != "PLACED":
+        return jsonify({"message": "Cannot cancel order now"}), 400
+
+    cursor.execute("""
+        UPDATE orders
+        SET order_status='CANCELLED'
+        WHERE id=%s
+    """, (order_id,))
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return jsonify({"message": "Order cancelled successfully"})
+
+
+
+@app.route("/api/order/<int:order_id>")
+def get_single_order(order_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+             SELECT 
+            o.id AS order_id,
+            o.total_amount,
+            o.payment_method,
+            o.order_status,
+            o.order_date,
+            o.address,
+
+            # p.id AS product_id,
+            p.name AS product_name,
+            p.image,
+            oi.quantity,
+            oi.price
+        FROM orders o
+        JOIN order_items oi ON o.id = oi.order_id
+        JOIN products p ON oi.product_id = p.id
+        WHERE o.id = %s
+    """, (order_id,))       
+    
+
+    rows = cursor.fetchall()
+
+    if not rows:
+        return jsonify({"message": "Order not found"}), 404
+
+    order = {
+        "id": rows[0]["order_id"],
+        # "customer_name": rows[0]["customer_name"],
+        "address": rows[0]["address"],
+        "total_amount": rows[0]["total_amount"],
+        "payment_method": rows[0]["payment_method"],
+        "order_status": rows[0]["order_status"],
+        "order_date": rows[0]["order_date"],
+        "products": []
+    }
+    for r in rows:
+         order["products"].append({
+        # "product_id": r["product_id"],
+        "name": r["product_name"],
+        "image": f"http://localhost:5000/uploads/{r['image']}",
+        "price": r["price"],
+        "quantity": r["quantity"]
+    })
+         
+    return jsonify(order)
+
+
+@app.route("/api/order-details/<int:order_id>")
+def get_order_details(order_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            o.id AS order_id,
+            o.total_amount,
+            o.payment_method,
+            o.order_status,
+            o.order_date,
+            o.address,
+
+            p.name AS product_name,
+            p.image,
+            p.category,
+            od.quantity,
+            od.price
+        FROM orders o
+        JOIN order_details od ON o.id = od.order_id
+        JOIN products p ON od.product_id = p.id
+        WHERE o.id = %s
+    """, (order_id,))
+
+    rows = cursor.fetchall()
+
+    if not rows:
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Order not found"}), 404
+
+    order = {
+        "id": rows[0]["order_id"],
+        "order_status": rows[0]["order_status"],
+        "payment_method": rows[0]["payment_method"],
+        "order_date": rows[0]["order_date"],
+        "address": rows[0]["address"],
+        "total_amount": rows[0]["total_amount"],
+        "products": []
+    }
+
+    for r in rows:
+        folder = r["category"]
+        if folder == "smallaplliance":
+                    folder = "smallappliance"
+
+        image_url = f"http://localhost:5000/uploads/{folder}/{r['image']}"
+
+           # image_url = f"http://localhost:5000/uploads/{r['category']}/{r['image']}"
+        order["products"].append({
+            "name": r["product_name"],
+            "image": image_url,
+            "quantity": r["quantity"],
+            "price": r["price"]
+        })
+
+    cursor.close()
+    db.close()
+
+    return jsonify(order)
+
+@app.route("/api/admin/orders", methods=["GET"])
+def admin_orders():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            id AS order_id,
+            customer_name,
+            total_amount,
+            order_status,
+            order_date
+        FROM orders
+        ORDER BY id DESC
+    """)
+
+    orders = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return jsonify({"orders": orders})
+
+
+
+
+@app.route("/api/admin/order-status/<int:order_id>", methods=["PUT"])
+def update_order_status(order_id):
+    data = request.json
+    status = data.get("status")
+
+    if status not in ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"]:
+        return jsonify({"message": "Invalid status"}), 400
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute(
+        "UPDATE orders SET order_status=%s WHERE id=%s",
+        (status, order_id)
+    )
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return jsonify({"message": "Status updated"})
+
+
+
+
+#wishlist
+# Add this to your Flask app
+
+@app.route("/api/wishlist/toggle", methods=["POST"])
+def toggle_wishlist():
+    data = request.json
+    customer_id = data.get("customer_id")
+    product_id = data.get("product_id")
+
+    if not customer_id or not product_id:
+        return jsonify({"error": "Missing fields"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+
+    # Check if already in wishlist
+    cursor.execute(
+        "SELECT * FROM wishlist WHERE customer_id=%s AND product_id=%s",
+        (customer_id, product_id)
+    )
+    item = cursor.fetchone()
+
+    if item:
+        cursor.execute(
+            "DELETE FROM wishlist WHERE customer_id=%s AND product_id=%s",
+            (customer_id, product_id)
+        )
+        conn.commit()
+        return jsonify({"status": "removed"})
+    else:
+        cursor.execute(
+            "INSERT INTO wishlist (customer_id, product_id) VALUES (%s, %s)",
+            (customer_id, product_id)
+        )
+        conn.commit()
+        return jsonify({"status": "added"})
+
+
+@app.route("/api/wishlist/<int:customer_id>", methods=["GET"])
+def get_wishlist(customer_id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT p.* FROM wishlist w
+        JOIN products p ON w.product_id = p.id
+        WHERE w.customer_id=%s
+    """, (customer_id,))
+    items = cursor.fetchall()
+    return jsonify(items)
+
+
+#place order
+
+@app.route("/api/place-order", methods=["POST"])
+def place_order():
+    data = request.json
+    print("ORDER DATA RECEIVED:", data)
+
+    customer_id = data.get("customer_id")
+    customer_name = data.get("customer_name")
+    address = data.get("address")
+    total_amount = data.get("total_amount")
+    payment_method = data.get("payment_method", "COD")
+
+    if not customer_id or not customer_name or not address or not total_amount:
+        return jsonify({"message": "Missing required fields"}), 400
+
+    conn = None
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1️⃣ Insert into orders
+        cursor.execute("""
+            INSERT INTO orders
+            (customer_id, customer_name, address, total_amount, payment_method, payment_status, order_status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            customer_id,
+            customer_name,
+            address,
+            total_amount,
+            payment_method,
+            "Pending" if payment_method == "COD" else "Paid",
+            "PLACED"
+        ))
+
+        order_id = cursor.lastrowid
+
+        # 2️⃣ Fetch cart items
+        cursor.execute("""
+            SELECT c.product_id, c.quantity, p.name, p.price 
+            FROM cart c
+            JOIN products p ON c.product_id = p.id
+            WHERE c.customer_id=%s
+        """, (customer_id,))
+        cart_items = cursor.fetchall()
+
+        if not cart_items:
+            return jsonify({"message": "Cart is empty"}), 400
+
+        # 3️⃣ Insert order details
+        for item in cart_items:
+            subtotal = item['price'] * item['quantity']
+            cursor.execute("""
+                INSERT INTO order_details
+                (order_id, product_id, product_name, quantity, price, total)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                order_id,
+                item['product_id'],
+                item['name'],
+                item['quantity'],
+                item['price'],
+                subtotal
+            ))
+
+        # 4️⃣ Clear cart
+        cursor.execute("DELETE FROM cart WHERE customer_id=%s", (customer_id,))
+
+        conn.commit()
+        return jsonify({"success": True, "message": "Order placed successfully", "order_id": order_id}), 201
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("PLACE ORDER ERROR:", e)
+        return jsonify({"message": "Internal server error", "error": str(e)}), 500
+
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

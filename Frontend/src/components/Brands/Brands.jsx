@@ -16,7 +16,7 @@ const brands = [
   { name: "Dell", logo: "https://upload.wikimedia.org/wikipedia/commons/1/18/Dell_logo_2016.svg" },
   { name: "Sony", logo: assets.sony},
   { name: "Lenovo", logo: assets.lenovo},
-  { name: "Asus", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg" }
+  // { name: "Asus", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg" }
 
 
  
