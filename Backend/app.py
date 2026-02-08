@@ -506,19 +506,38 @@ def add_product():
 
 
 #deactivate product 
+# @app.route("/api/products/<int:id>/status", methods=["PUT"])
+# def toggle_product_status(id):
+#     db = get_db()
+#     cursor = db.cursor()
+#     cursor.execute("""
+#         UPDATE products
+#         SET is_active = NOT is_active
+#         WHERE id = %s
+#     """, (id,))
+#     db.commit()
+#     cursor.close()
+#     db.close()
+#     return jsonify({"message": "Product status updated"})
+
+# Flask example
 @app.route("/api/products/<int:id>/status", methods=["PUT"])
 def toggle_product_status(id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("""
-        UPDATE products
-        SET is_active = NOT is_active
-        WHERE id = %s
-    """, (id,))
+
+    # toggle status in DB
+    cursor.execute("SELECT is_active FROM products WHERE id=%s", (id,))
+    current = cursor.fetchone()
+    if current is None:
+        return jsonify({"error": "Product not found"}), 404
+
+    new_status = 0 if current[0] == 1 else 1
+    cursor.execute("UPDATE products SET is_active=%s WHERE id=%s", (new_status, id))
     db.commit()
-    cursor.close()
-    db.close()
-    return jsonify({"message": "Product status updated"})
+
+    return jsonify({"id": id, "is_active": new_status})
+
 
 #search
 @app.route("/search-suggestions", methods=["GET"])
@@ -927,7 +946,7 @@ def admin_get_products():
     cursor = db.cursor(dictionary=True)
 
     cursor.execute(
-        "SELECT id, name, category, price, stock FROM products"
+        "SELECT id, name, category, price, stock,is_active FROM products"
     )
     products = cursor.fetchall()
 
@@ -1148,90 +1167,285 @@ def get_single_order(order_id):
     return jsonify(order)
 
 
-@app.route("/api/order-details/<int:order_id>")
-def get_order_details(order_id):
+# @app.route("/api/order-details/<int:order_id>")
+# def get_order_details(order_id):
+#     db = get_db()
+#     cursor = db.cursor(dictionary=True)
+
+#     cursor.execute("""
+#         SELECT 
+#             o.id AS order_id,
+#             o.total_amount,
+#             o.payment_method,
+#             o.order_status,
+#             o.order_date,
+    #         o.address,
+
+    #         p.name AS product_name,
+    #         p.image,
+    #         p.category,
+    #         od.quantity,
+    #         od.price
+    #     FROM orders o
+    #     JOIN order_details od ON o.id = od.order_id
+    #     JOIN products p ON od.product_id = p.id
+    #     WHERE o.id = %s
+    # """, (order_id,))
+
+    # rows = cursor.fetchall()
+
+    # if not rows:
+    #     cursor.close()
+    #     db.close()
+    #     return jsonify({"message": "Order not found"}), 404
+
+    # order = {
+    #     "id": rows[0]["order_id"],
+    #     "order_status": rows[0]["order_status"],
+    #     "payment_method": rows[0]["payment_method"],
+    #     "order_date": rows[0]["order_date"],
+    #     "address": rows[0]["address"],
+    #     "total_amount": rows[0]["total_amount"],
+    #     "products": []
+    # }
+
+    # for r in rows:
+    #     folder = r["category"]
+    #     if folder == "smallaplliance":
+    #                 folder = "smallappliance"
+
+    #     image_url = f"http://localhost:5000/uploads/{folder}/{r['image']}"
+
+    #        # image_url = f"http://localhost:5000/uploads/{r['category']}/{r['image']}"
+    #     order["products"].append({
+    #         "name": r["product_name"],
+    #         "image": image_url,
+    #         "quantity": r["quantity"],
+    #         "price": r["price"]
+    #     })
+
+    # cursor.close()
+    # db.close()
+
+    # return jsonify(order)
+
+
+
+@app.route("/api/order-details/<int:order_id>", methods=["GET"])
+def order_details(order_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT 
-            o.id AS order_id,
-            o.total_amount,
-            o.payment_method,
-            o.order_status,
-            o.order_date,
-            o.address,
+    try:
+        # 1️⃣ Get order info
+        cursor.execute("SELECT * FROM orders WHERE id=%s", (order_id,))
+        order = cursor.fetchone()
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
 
-            p.name AS product_name,
-            p.image,
-            p.category,
-            od.quantity,
-            od.price
-        FROM orders o
-        JOIN order_details od ON o.id = od.order_id
-        JOIN products p ON od.product_id = p.id
-        WHERE o.id = %s
-    """, (order_id,))
+        # 2️⃣ Get products in the order
+        cursor.execute("""
+            SELECT p.name, p.price, p.image,p.category, od.quantity
+            FROM order_details od
+            JOIN products p ON od.product_id = p.id
+            WHERE od.order_id = %s
+        """, (order_id,))
+        products = cursor.fetchall()
+        for p in products:
+                    folder = p["category"]
+                    if folder == "smallaplliance":
+                        folder = "smallappliance"
+                    p["image"] = f"http://localhost:5000/uploads/{folder}/{p['image']}"
+   
+        # 3️⃣ Merge products into order
+        order['products'] = products
 
-    rows = cursor.fetchall()
+        return jsonify(order)
+    
+    except Exception as e:
+        print("Order details error:", e)
+        return jsonify({"error": "Internal server error"}), 500
 
-    if not rows:
+    finally:
         cursor.close()
         db.close()
-        return jsonify({"message": "Order not found"}), 404
 
-    order = {
-        "id": rows[0]["order_id"],
-        "order_status": rows[0]["order_status"],
-        "payment_method": rows[0]["payment_method"],
-        "order_date": rows[0]["order_date"],
-        "address": rows[0]["address"],
-        "total_amount": rows[0]["total_amount"],
-        "products": []
-    }
-
-    for r in rows:
-        folder = r["category"]
-        if folder == "smallaplliance":
-                    folder = "smallappliance"
-
-        image_url = f"http://localhost:5000/uploads/{folder}/{r['image']}"
-
-           # image_url = f"http://localhost:5000/uploads/{r['category']}/{r['image']}"
-        order["products"].append({
-            "name": r["product_name"],
-            "image": image_url,
-            "quantity": r["quantity"],
-            "price": r["price"]
-        })
-
-    cursor.close()
-    db.close()
-
-    return jsonify(order)
-
-@app.route("/api/admin/orders", methods=["GET"])
-def admin_orders():
+@app.route("/api/admin/chart/orders-week")
+def chart_orders_week():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
     cursor.execute("""
         SELECT 
-            id AS order_id,
-            customer_name,
-            total_amount,
-            order_status,
-            order_date
-        FROM orders
-        ORDER BY id DESC
+           w.week AS week,
+          COALESCE(COUNT(o.id), 0) AS orders
+        FROM (
+          SELECT WEEK(CURDATE()) - 3 AS week UNION
+          SELECT WEEK(CURDATE()) - 2 UNION
+          SELECT WEEK(CURDATE()) - 1 UNION
+          SELECT WEEK(CURDATE())
+        ) w
+        LEFT JOIN orders o 
+          ON WEEK(o.order_date) = w.week
+          AND MONTH(o.order_date) = MONTH(CURDATE())
+          AND YEAR(o.order_date) = YEAR(CURDATE())
+        GROUP BY w.week
+        ORDER BY w.week
     """)
 
-    orders = cursor.fetchall()
+    data = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    return jsonify(data)
+
+
+@app.route("/api/admin/chart/revenue-week")
+def chart_revenue_week():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+           w.week AS week,
+          COALESCE(SUM(o.total_amount), 0) AS revenue
+        FROM (
+          SELECT WEEK(CURDATE()) - 3 AS week UNION
+          SELECT WEEK(CURDATE()) - 2 UNION
+          SELECT WEEK(CURDATE()) - 1 UNION
+          SELECT WEEK(CURDATE())
+        ) w
+        LEFT JOIN orders o 
+          ON WEEK(o.order_date) = w.week
+          AND MONTH(o.order_date) = MONTH(CURDATE())
+          AND YEAR(o.order_date) = YEAR(CURDATE())
+          AND o.order_status = 'DELIVERED'
+        GROUP BY w.week
+        ORDER BY w.week
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    return jsonify(data)
+
+
+@app.route("/api/admin/chart/category-orders")
+def category_wise_orders():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            p.category AS name,
+            SUM(od.quantity) AS value
+        FROM order_details od
+        JOIN products p ON od.product_id = p.id
+        JOIN orders o ON od.order_id = o.id
+        WHERE MONTH(o.order_date) = MONTH(CURDATE())
+        AND YEAR(o.order_date) = YEAR(CURDATE())
+        GROUP BY p.category
+        ORDER BY value DESC
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    return jsonify(data)
+
+@app.route("/api/admin/dashboard/top-products")
+def top_selling_products():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            p.name,
+            SUM(od.quantity) AS total_sold
+        FROM order_details od
+        JOIN products p ON od.product_id = p.id
+        GROUP BY od.product_id
+        ORDER BY total_sold DESC
+        LIMIT 5
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    return jsonify(data)
+
+@app.route("/api/admin/dashboard/order-status")
+def order_status_summary():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT order_status AS status, COUNT(*) AS total
+        FROM orders
+        GROUP BY order_status
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    db.close()
+
+    return jsonify(data)
+
+
+
+@app.route("/api/admin/dashboard")
+def admin_dashboard():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT COUNT(*) AS total_products FROM products")
+    products = cursor.fetchone()["total_products"]
+
+    cursor.execute("SELECT COUNT(*) AS total_orders FROM orders")
+    orders = cursor.fetchone()["total_orders"]
+
+    cursor.execute("SELECT COUNT(*) AS total_users FROM customers")
+    users = cursor.fetchone()["total_users"]
+
+    cursor.execute("SELECT SUM(total_amount) AS revenue FROM orders")
+    revenue = cursor.fetchone()["revenue"] or 0
 
     cursor.close()
     db.close()
 
-    return jsonify({"orders": orders})
+    return jsonify({
+        "products": products,
+        "orders": orders,
+        "users": users,
+        "revenue": revenue
+    })
+
+
+# @app.route("/api/admin/orders", methods=["GET"])
+# def admin_orders():
+#     db = get_db()
+#     cursor = db.cursor(dictionary=True)
+
+#     cursor.execute("""
+#         SELECT 
+#             id AS order_id,
+#             customer_name,
+#             total_amount,
+#             order_status,
+#             order_date
+#         FROM orders
+#         ORDER BY id DESC
+#     """)
+
+#     orders = cursor.fetchall()
+
+#     cursor.close()
+#     db.close()
+
+#     return jsonify({"orders": orders})
 
 
 
@@ -1395,6 +1609,42 @@ def place_order():
             cursor.close()
             conn.close()
 
+
+
+@app.route("/api/order-details/<int:order_id>", methods=["GET"])
+def get_order_details(order_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    try:
+        # 1️⃣ Fetch order main info
+        cursor.execute("SELECT * FROM orders WHERE id=%s", (order_id,))
+        order_info = cursor.fetchone()
+
+        if not order_info:
+            return jsonify({"error": "Order not found"}), 404
+
+        # 2️⃣ Fetch products from order_details table
+        cursor.execute("""
+            SELECT p.name, p.price, p.image, od.quantity
+            FROM order_details od
+            JOIN products p ON od.product_id = p.id
+            WHERE od.order_id = %s
+        """, (order_id,))
+        products = cursor.fetchall()
+
+        # 3️⃣ Attach products to order info
+        order_info['products'] = products
+
+        return jsonify(order_info)
+
+    except mysql.connector.Error as err:
+        print("Database error:", err)
+        return jsonify({"error": "Database query failed"}), 500
+
+    finally:
+        cursor.close()
+        db.close()
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
