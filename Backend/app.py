@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask import render_template_string
 import mysql.connector
 import os
 
@@ -459,12 +460,12 @@ def add_product():
     name = request.form.get("name")
     price = request.form.get("price")
     stock = request.form.get("stock")
-    brand = request.form.get("brand")
+    brand = request.form.get("brand") or None
     category_id = request.form.get("category_id")
     subcategory_id = request.form.get("subcategory_id")
     image = request.files.get("image")
 
-    if not all([name, price, stock, brand, category_id, subcategory_id, image]):
+    if not all([name, price, stock,category_id, subcategory_id, image]):
         return jsonify({"message": "All fields required"}), 400
 
     db = get_db()
@@ -723,13 +724,30 @@ def mobiles():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute(
-        "SELECT id, name, price, image FROM products WHERE category='mobile'AND is_active=1"
-    )
+    cursor.execute("""
+        SELECT 
+            p.id,
+            p.name,
+            p.price,
+            p.image,
+            p.category,
+            s.name AS subcategory_name
+        FROM products p
+        LEFT JOIN subcategories s ON p.subcategory_id = s.id
+        WHERE p.category='mobile'
+        AND p.is_active=1
+        ORDER BY s.name
+    """)
+
     mobiles = cursor.fetchall()
 
     for m in mobiles:
-        m["image"] = f"http://localhost:5000/uploads/mobile/{m['image']}"
+        folder = m["category"]
+        if folder == "smallaplliance":
+            folder = "smallappliance"
+        m["image"] = f"http://localhost:5000/uploads/{folder}/{m['image']}"
+
+    cursor.close()
 
     db.close()
     return jsonify(mobiles)
@@ -752,12 +770,33 @@ def tvs():
 def laptops():
     db = get_db()
     cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            p.id,
+            p.name,
+            p.price,
+            p.image,
+            p.category,
+            s.name AS subcategory_name
+        FROM products p
+        LEFT JOIN subcategories s ON p.subcategory_id = s.id
+        WHERE p.category='laptop'
+        AND p.is_active=1
+        ORDER BY s.name
+    """)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='laptop'AND is_active=1")
     laptops = cursor.fetchall()
 
     for l in laptops:
-        l["image"] = f"http://localhost:5000/uploads/laptop/{l['image']}"
+        folder = l["category"]
+        l["image"] = f"http://localhost:5000/uploads/{folder}/{l['image']}"
+
+    cursor.close()
+    # cursor.execute("SELECT id, name, price, image FROM products WHERE category='laptop'AND is_active=1")
+    # laptops = cursor.fetchall()
+
+    # for l in laptops:
+    #     l["image"] = f"http://localhost:5000/uploads/laptop/{l['image']}"
 
     db.close()
     return jsonify(laptops)
@@ -836,15 +875,36 @@ def speakers():
 def computers():
     db = get_db()
     cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            p.id,
+            p.name,
+            p.price,
+            p.image,
+            p.category,
+            s.name AS subcategory_name
+        FROM products p
+        LEFT JOIN subcategories s ON p.subcategory_id = s.id
+        WHERE p.category='computer'
+        AND p.is_active=1
+        ORDER BY s.name
+    """)
 
-    cursor.execute("SELECT id, name, price, image FROM products WHERE category='computer'AND is_active=1")
-    items = cursor.fetchall()
+    computers = cursor.fetchall()
 
-    for p in items:
-        p["image"] = f"http://localhost:5000/uploads/computer/{p['image']}"
+    for c in computers:
+        folder = c["category"]
+        c["image"] = f"http://localhost:5000/uploads/{folder}/{c['image']}"
+
+    cursor.close()
+    # cursor.execute("SELECT id, name, price, image FROM products WHERE category='computer'AND is_active=1")
+    # items = cursor.fetchall()
+
+    # for p in items:
+    #     p["image"] = f"http://localhost:5000/uploads/computer/{p['image']}"
 
     db.close()
-    return jsonify(items)
+    return jsonify(computers)
 
 @app.route("/api/tablets")
 def tablets():
@@ -1645,6 +1705,165 @@ def get_order_details(order_id):
     finally:
         cursor.close()
         db.close()
+
+
+
+
+@app.route("/api/invoice/<int:order_id>")
+def generate_invoice(order_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Get Order
+    cursor.execute("SELECT * FROM orders WHERE id=%s", (order_id,))
+    order = cursor.fetchone()
+
+    if not order:
+        return "Invoice not found", 404
+
+    # Get Products
+    cursor.execute("""
+        SELECT p.name, p.price, p.image, p.category, od.quantity
+        FROM order_details od
+        JOIN products p ON od.product_id = p.id
+        WHERE od.order_id=%s
+    """, (order_id,))
+    products = cursor.fetchall()
+
+    grand_total = 0
+    for p in products:
+        p["subtotal"] = p["price"] * p["quantity"]
+        grand_total += p["subtotal"]
+
+    cursor.close()
+    db.close()
+
+    # Simple HTML Invoice Template
+    html = """
+    <html>
+    <head>
+        <title>Invoice</title>
+        <style>
+            body { font-family: Arial; padding: 20px; }
+            h2 { text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            table, th, td { border: 1px solid #ddd; }
+            th, td { padding: 10px; text-align: center; }
+            .total { text-align: right; margin-top: 20px; font-size: 18px; }
+            .print-btn { margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+
+        <h2>ElectroMart Invoice</h2>
+
+        <p><strong>Order ID:</strong> {{order.id}}</p>
+        <p><strong>Name:</strong> {{order.customer_name}}</p>
+        <p><strong>Address:</strong> {{order.address}}</p>
+        <p><strong>Date:</strong> {{order.order_date}}</p>
+
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+            </tr>
+
+            {% for p in products %}
+            <tr>
+                <td>{{p.name}}</td>
+                <td>₹{{p.price}}</td>
+                <td>{{p.quantity}}</td>
+                <td>₹{{p.subtotal}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="total">
+            <strong>Total: ₹{{grand_total}}</strong>
+        </div>
+
+        <button onclick="window.print()" class="print-btn">
+            Print Invoice
+        </button>
+
+    </body>
+    </html>
+    """
+
+    return render_template_string(
+        html,
+        order=order,
+        products=products,
+        grand_total=grand_total
+    )
+
+
+@app.route("/admin/reports")
+def admin_reports():
+    # month = request.args.get("month")
+    # year = request.args.get("year")
+    month = int(request.args.get("month"))
+    year = int(request.args.get("year"))
+
+
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    # Total Orders
+    cur.execute("""
+        SELECT COUNT(*) as total_orders,
+               SUM(total_amount) as total_revenue
+        FROM orders
+        WHERE MONTH(order_date)=%s AND YEAR(order_date)=%s
+    """, (month, year))
+    summary = cur.fetchone()
+
+    # Products Sold
+    cur.execute("""
+    SELECT SUM(oi.quantity) as total_products
+    FROM order_details oi
+    JOIN orders o ON oi.order_id = o.id
+    WHERE MONTH(o.order_date)=%s AND YEAR(o.order_date)=%s
+""", (month, year))
+
+    product_data = cur.fetchone()
+
+    # Weekly Breakdown
+    cur.execute("""
+        SELECT WEEK(order_date) as week,
+               SUM(total_amount) as revenue
+        FROM orders
+        WHERE MONTH(order_date)=%s AND YEAR(order_date)=%s
+        GROUP BY week
+    """, (month, year))
+    weekly = cur.fetchall()
+
+    # Category Wise
+    cur.execute("""
+    SELECT p.category,
+           SUM(oi.quantity) as total_sold
+    FROM order_details oi
+    JOIN products p ON oi.product_id = p.id
+    JOIN orders o ON oi.order_id = o.id
+    WHERE MONTH(o.order_date)=%s AND YEAR(o.order_date)=%s
+    GROUP BY p.category
+""", (month, year))
+
+    category = cur.fetchall()
+
+    cur.close()
+    db.close()
+
+    return jsonify({
+        "total_orders": summary["total_orders"] or 0,
+        "total_revenue": summary["total_revenue"] or 0,
+        "total_products": product_data["total_products"] or 0,
+        "avg_order_value": (summary["total_revenue"] or 0) / (summary["total_orders"] or 1),
+        "weekly_data": weekly,
+        "category_data": category
+    })
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":
