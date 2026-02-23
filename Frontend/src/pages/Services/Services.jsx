@@ -2,64 +2,73 @@ import "./services.css";
 
 const Services = () => {
   return (
-    <div className="services-container">
-      <h1>Our Services</h1>
+    <div className="services-wrapper">
 
-      <p className="intro">
-        At <strong>ElectroMart</strong>, we go beyond selling products. Our
-        services are designed to provide a smooth, reliable, and satisfying
-        shopping experience.
-      </p>
-
-      <div className="service-box">
-        <h2>🛒 Online Shopping</h2>
+      {/* Header Section */}
+      <section className="services-hero">
+        <h1>Our Services</h1>
         <p>
-          Browse and purchase the latest electronics including smartphones,
-          smart TVs, laptops, and accessories from the comfort of your home.
+          At <strong>ElectroMart</strong>, we provide reliable services that
+          ensure a smooth and secure shopping experience for every customer.
         </p>
-      </div>
+      </section>
 
-      <div className="service-box">
-        <h2>🚚 Fast & Secure Delivery</h2>
-        <p>
-          We ensure safe packaging and timely delivery of your products with
-          real-time order tracking.
-        </p>
-      </div>
+      {/* Services Grid */}
+      <section className="services-grid">
 
-      <div className="service-box">
-        <h2>🔒 Secure Payments</h2>
-        <p>
-          Multiple payment options with high-level security to keep your
-          transactions safe and hassle-free.
-        </p>
-      </div>
+        <div className="service-card">
+          <span className="icon">🛒</span>
+          <h3>Online Shopping</h3>
+          <p>
+            Shop the latest smartphones, laptops, smart TVs, and accessories
+            anytime from anywhere.
+          </p>
+        </div>
 
-      <div className="service-box">
-        <h2>🔁 Easy Returns</h2>
-        <p>
-          Simple and transparent return policy to make sure you shop with
-          confidence.
-        </p>
-      </div>
+        <div className="service-card">
+          <span className="icon">🚚</span>
+          <h3>Fast Delivery</h3>
+          <p>
+            Safe packaging and timely delivery with real-time tracking.
+          </p>
+        </div>
 
-      <div className="service-box">
-        <h2>📞 Customer Support</h2>
-        <p>
-          Our support team is always ready to help you with orders, returns, and
-          product-related queries.
-        </p>
-      </div>
+        <div className="service-card">
+          <span className="icon">🔒</span>
+          <h3>Secure Payments</h3>
+          <p>
+            Multiple secure payment options with advanced protection.
+          </p>
+        </div>
 
-      <div className="service-box">
-        <h2>🛠 Product Support & Warranty</h2>
-        <p>
-          All products come with manufacturer warranty and after-sales support.
-        </p>
-      </div>
+        <div className="service-card">
+          <span className="icon">🔁</span>
+          <h3>Easy Returns</h3>
+          <p>
+            Transparent return policies to ensure stress-free shopping.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <span className="icon">📞</span>
+          <h3>Customer Support</h3>
+          <p>
+            Dedicated support team available to assist you anytime.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <span className="icon">🛠</span>
+          <h3>Warranty Support</h3>
+          <p>
+            Genuine products backed by manufacturer warranty.
+          </p>
+        </div>
+
+      </section>
+
     </div>
   );
 };
 
 export default Services;
-

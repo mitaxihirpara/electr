@@ -11,18 +11,33 @@ const ComputerCatalog = () => {
       .then(data => setComputers(data))
       .catch(err => console.error(err));
   }, []);
+const groupedComputers = computers.reduce((acc, computer) => {
+  const sub = computer.subcategory_name || "All Computers";
 
-  return (
-    <div className="computer-page">
-      <h2 className="page-title">Desktop Computers</h2>
+  if (!acc[sub]) {
+    acc[sub] = [];
+  }
 
-      <div className="computer-grid">
-        {computers.map(item => (
-          <ProductCard key={item.id} product={item} />
-        ))}
-      </div>
+  acc[sub].push(computer);
+  return acc;
+}, {});
+
+ return (
+    <div className="catalog-wrapper">
+      <h2>Computers</h2>
+
+      {Object.keys(groupedComputers).map((sub) => (
+        <div key={sub} className="subcategory-section">
+          <h3 className="subcategory-title">{sub}</h3>
+
+          <div className="catalog-grid">
+            {groupedComputers[sub].map((computer) => (
+              <ProductCard key={computer.id} product={computer} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
-
 export default ComputerCatalog;

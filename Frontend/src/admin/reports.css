@@ -1,0 +1,59 @@
+.reports-container {
+    padding: 20px;
+}
+
+.filters {
+    margin-bottom: 20px;
+}
+
+.filters select {
+    padding: 6px 10px;
+    margin-right: 10px;
+}
+
+.kpi-cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.card h4 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.card p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1976d2;
+}
+
+.charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* equal width */
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.chart-box {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    height: 420px;
+    /* equal height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

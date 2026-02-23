@@ -1,91 +1,67 @@
 .contact-page {
-    background: #f6f8fb;
+    min-height: 100vh;
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
     padding: 60px 20px;
-    color: #111;
+    font-family: "Segoe UI", sans-serif;
 }
 
-
-/* Header */
-
-.contact-header {
-    text-align: center;
+.contact-container {
+    background: white;
     max-width: 700px;
-    margin: 0 auto 50px;
+    width: 100%;
+    padding: 50px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
-.contact-header h1 {
-    font-size: 36px;
+.contact-container h1 {
+    text-align: center;
+    font-size: 32px;
+    color: #1e3a8a;
     margin-bottom: 10px;
 }
 
-.contact-header p {
-    color: #555;
-    line-height: 1.6;
-}
-
-
-/* Layout */
-
-.contact-wrapper {
-    max-width: 700px;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-}
-
-
-/* Contact info */
-
-.contact-info {
-    background: #ffffff;
-    padding: 45px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    width: 100%;
-}
-
-.contact-info h2 {
-    margin-bottom: 25px;
-}
-
-.info-item {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.info-item svg {
-    font-size: 22px;
-    color: #0a58ca;
-}
-
-.info-item h4 {
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 40px;
     font-size: 15px;
-    margin-bottom: 4px;
 }
 
-.info-item p {
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contact-row:last-child {
+    border-bottom: none;
+}
+
+.icon {
+    font-size: 20px;
+    color: #2563eb;
+    min-width: 30px;
+}
+
+.contact-row h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #111827;
+}
+
+.contact-row p {
+    margin: 3px 0 0;
+    color: #6b7280;
     font-size: 14px;
-    color: #555;
-}
-
-.support-note {
-    margin-top: 20px;
-    padding: 12px;
-    background: #eaf1ff;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-
-/* Responsive */
-
-@media (max-width: 768px) {
-    .contact-info {
-        padding: 30px 25px;
-    }
-    
-    .contact-header h1 {
-        font-size: 28px;
-    }
 }

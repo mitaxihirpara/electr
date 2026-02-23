@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./AdminOrders.css"
 
 function AdminOrders() {
   // console.log("🔥 AdminOrders component loaded");
@@ -38,7 +39,10 @@ function AdminOrders() {
     try {
       await axios.put(
         `http://localhost:5000/api/admin/order-status/${orderId}`,
-        { status }
+        { status },
+        {
+        headers: { "Content-Type": "application/json" }
+      }
       );
       fetchOrders();
     } catch (err) {
@@ -69,18 +73,19 @@ function AdminOrders() {
 
           <tbody>
             {orders.map(order => (
-              <tr key={order.order_id}>
+              <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{order.customer_name}</td>
                 <td>₹{order.total_amount}</td>
                 <td>{order.order_status}</td>
 
-                <td>
+                <td className="manage-cell">
                   <select
                     value={order.order_status}
                     onChange={e =>
-                      changeStatus(order.order_id, e.target.value)
+                      changeStatus(order.id, e.target.value)
                     }
+                     className={`status-dropdown ${order.order_status}`}
                   >
                     <option value="PLACED">PLACED</option>
                     <option value="SHIPPED">SHIPPED</option>
@@ -88,10 +93,10 @@ function AdminOrders() {
                     <option value="CANCELLED">CANCELLED</option>
                   </select>
 
-                  <button
-                    style={{ marginLeft: 10 }}
+                  <button  className="view-btn"
+                    // style={{ marginLeft: 10 }}
                     onClick={() =>
-                      navigate(`/admin/order/${order.order_id}`)
+                      navigate(`/admin/order/${order.id}`)
                     }
                   >
                     View

@@ -1,72 +1,83 @@
-
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./checkout.css";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Get customer info from localStorage
   const customer_id = Number(localStorage.getItem("customer_id"));
   const customer_name = localStorage.getItem("customer_name");
-  const cart_total = Number(localStorage.getItem("cart_total") || 0);
 
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [loading, setLoading] = useState(false);
 
-  const confirmOrder = async () => {
-    // Validation
+  const [cartTotal, setCartTotal] = useState(0);
+
+  // 🔥 Check if Buy Now data exists
+  const buyNowItem = location.state?.buyNowItem;
+
+  useEffect(() => {
+    if (!customer_id) return;
+
+    // ✅ If Buy Now
+    if (buyNowItem) {
+      const total = buyNowItem.price * buyNowItem.quantity;
+      setCartTotal(total);
+    } 
+    // ✅ Normal Cart Flow
+    else {
+      fetch(`http://localhost:5000/api/cart/${customer_id}`)
+        .then(res => res.json())
+        .then(data => {
+          const items = data.cart_items || [];
+
+          const total = items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+
+          setCartTotal(total);
+        })
+        .catch(err => console.error(err));
+    }
+  }, [customer_id, buyNowItem]);
+
+  const confirmOrder = () => {
     if (!customer_id || !customer_name) {
-      alert("Please login first to place an order");
+      alert("Please login first");
       navigate("/login");
       return;
     }
 
-    if (cart_total <= 0) {
-      alert("Your cart is empty");
+    if (cartTotal <= 0) {
+      alert("Cart is empty");
       navigate("/cart");
       return;
     }
 
     if (!address.trim()) {
-      alert("Please enter delivery address");
+      alert("Enter delivery address");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      // Post order to backend
-      const res = await axios.post("http://localhost:5000/api/place-order", {
+    navigate("/payment", {
+      state: {
         customer_id,
         customer_name,
         address,
-        total_amount: cart_total,
+        total_amount: cartTotal,
         payment_method: paymentMethod,
-      });
-
-      if (res.data.success) {
-        alert("Order placed successfully 🎉");
-        // Clear cart after order
-        localStorage.setItem("cart_total", 0);
-        navigate("/orders");
-      } else {
-        alert("Order could not be placed. Please try again");
+        buyNowItem: buyNowItem || null
       }
-    } catch (err) {
-      console.error("ORDER ERROR:", err.response || err);
-      alert("Something went wrong while placing the order");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
+
+  if (!customer_id) return <h3>Please login</h3>;
 
   return (
     <div className="checkout-page">
-      <h2>Checkout</h2>
+      <h2>Review & Pay</h2>
 
       <div className="checkout-section">
         <h3>Delivery Address</h3>
@@ -79,7 +90,8 @@ const Checkout = () => {
 
       <div className="checkout-section">
         <h3>Payment Method</h3>
-        <label className="radio-row">
+
+        <label>
           <input
             type="radio"
             checked={paymentMethod === "COD"}
@@ -87,16 +99,22 @@ const Checkout = () => {
           />
           Cash on Delivery
         </label>
+
+        <label>
+          <input
+            type="radio"
+            checked={paymentMethod === "ONLINE"}
+            onChange={() => setPaymentMethod("ONLINE")}
+          />
+          Online Payment
+        </label>
       </div>
 
       <div className="checkout-footer">
-        <p><b>Total Amount:</b> ₹{cart_total}</p>
-        <button
-          className="confirm-order-btn"
-          onClick={confirmOrder}
-          disabled={loading}
-        >
-          {loading ? "Placing Order..." : "Confirm Order"}
+        <p><b>Total Amount:</b> ₹{cartTotal}</p>
+
+        <button onClick={confirmOrder}>
+          Confirm Order
         </button>
       </div>
     </div>

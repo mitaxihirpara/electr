@@ -45,7 +45,8 @@
     color: #fff;
 }
 
-.status.Pending {
+
+/* .status.Pending {
     background: orange;
 }
 
@@ -59,7 +60,7 @@
 
 .status.Cancelled {
     background: #ef4444;
-}
+} */
 
 .view-btn {
     padding: 6px 12px;
@@ -72,4 +73,63 @@
 
 .view-btn:hover {
     background: #374151;
+}
+
+
+/* Manage column container */
+
+.manage-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+}
+
+
+/* Status dropdown */
+
+.status-dropdown {
+    width: 140px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fff;
+}
+
+
+/* View button */
+
+.view-btn {
+    width: 140px;
+    padding: 8px 0;
+    background-color: #1677ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.view-btn:hover {
+    background-color: #0958d9;
+}
+
+.status-dropdown.PLACED {
+    border-color: orange;
+}
+
+.status-dropdown.SHIPPED {
+    border-color: #0d6efd;
+}
+
+.status-dropdown.DELIVERED {
+    border-color: #198754;
+}
+
+.status-dropdown.CANCELLED {
+    border-color: #dc3545;
 }

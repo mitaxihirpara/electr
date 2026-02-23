@@ -1,0 +1,241 @@
+/* /* Container styling
+
+.order-details-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Headings */
+
+
+/* .order-details-container h2 {
+    margin-bottom: 10px;
+    color: #222;
+    font-size: 28px;
+}
+
+.order-details-container h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #444;
+    font-size: 22px; */
+
+
+/* } */
+
+
+/* Order info paragraphs */
+
+
+/* .order-details-container p {
+    margin: 5px 0;
+    font-size: 16px;
+} */
+
+
+/* Table styling */
+
+
+/* .order-details-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.order-details-container th,
+.order-details-container td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.order-details-container th {
+    background-color: #1976d2;
+    color: #fff;
+    font-weight: 600;
+} */
+
+
+/* .order-details-container tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.order-details-container tr:hover {
+    background-color: #e3f2fd;
+    transition: 0.2s;
+} */
+
+
+/* Product images */
+
+
+/* .order-details-container img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+} */
+
+
+/* Responsive */
+
+
+/* @media screen and (max-width: 600px) {
+    .order-details-container table,
+    .order-details-container thead,
+    .order-details-container tbody,
+    .order-details-container th,
+    .order-details-container td,
+    .order-details-container tr {
+        display: block;
+    }
+    .order-details-container tr {
+        margin-bottom: 15px;
+    }
+    .order-details-container td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+    .order-details-container td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        text-align: left;
+        font-weight: bold;
+    }
+    .order-details-container img {
+        margin: 0 auto;
+        display: block;
+    }
+}
+
+ .order-details-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: auto;
+}
+
+.order-summary p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.products-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.products-table th,
+.products-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.products-table th {
+    background-color: #0000;
+    font-weight: bold;
+}
+
+.products-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}   */
+
+.order-details-container {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    max-width: 900px;
+    margin: auto;
+    background-color: #f9f9f9;
+    /* light grey background */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #333;
+    /* default text color dark */
+}
+
+.order-details-container h2 {
+    margin-bottom: 10px;
+    color: #222;
+    /* dark heading */
+    font-size: 28px;
+    border-bottom: 2px solid #4caf50;
+    padding-bottom: 5px;
+}
+
+.order-details-container h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    color: #4caf50;
+    font-size: 22px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 3px;
+}
+
+.order-summary p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.products-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.products-table th,
+.products-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+}
+
+.products-table th {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+}
+
+.products-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}

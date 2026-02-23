@@ -1,63 +1,70 @@
 import React from "react";
 import "./Contact.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faEnvelope,faPhone,faLocationDot,faHeadset} from "@fortawesome/free-solid-svg-icons";
+import {
+  faEnvelope,
+  faPhone,
+  faLocationDot,
+  faHeadset,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Contact = () => {
   return (
     <div className="contact-page">
-      {/* Header */}
-      <div className="contact-header">
-        <h1>We’re Here to Help ⚡</h1>
-        <p>
-          Questions about gadgets, orders, warranty, or repairs?
-          Our electronics support team is always ready.
+
+      <div className="contact-container">
+        <h1>Contact Us</h1>
+        <p className="subtitle">
+          We're here to assist you with any queries related to your orders,
+          products, or support.
         </p>
-      </div>
 
-      {/* Content */}
-      <div className="contact-wrapper">
-        <div className="contact-info">
-          <h2>ElectroMart Support</h2>
+        <div className="contact-details">
 
-          <div className="info-item">
-            <FontAwesomeIcon icon={faHeadset} />
+          <div className="contact-row">
+            <FontAwesomeIcon icon={faHeadset} className="icon" />
             <div>
               <h4>Customer Support</h4>
-              <p>Mon–Sat | 9:00 AM – 8:00 PM</p>
+              <p>Mon – Sat | 9:00 AM – 8:00 PM</p>
             </div>
           </div>
 
-          <div className="info-item">
-            <FontAwesomeIcon icon={faPhone} />
+          <div className="contact-row">
+            <FontAwesomeIcon icon={faPhone} className="icon" />
             <div>
-              <h4>Call Us</h4>
+              <h4>Phone</h4>
               <p>0804 584 5678</p>
             </div>
           </div>
 
-          <div className="info-item">
-            <FontAwesomeIcon icon={faEnvelope} />
+          <div className="contact-row">
+            <FontAwesomeIcon icon={faEnvelope} className="icon" />
             <div>
               <h4>Email</h4>
               <p>support@electromart.com</p>
             </div>
           </div>
 
-          <div className="info-item">
-            <FontAwesomeIcon icon={faLocationDot} />
+          <div className="contact-row">
+            <FontAwesomeIcon icon={faLocationDot} className="icon" />
             <div>
-              <h4>Store Location</h4>
+              <h4>Location</h4>
               <p>Ahmedabad, Gujarat, India</p>
             </div>
           </div>
 
-          <div className="support-note">
-            <strong>Fast Support:</strong>  
-            Most queries resolved within 24 hours.
+          <div className="contact-row">
+            <FontAwesomeIcon icon={faClock} className="icon" />
+            <div>
+              <h4>Working Hours</h4>
+              <p>We usually respond within 24 hours.</p>
+            </div>
           </div>
+
         </div>
       </div>
+
     </div>
   );
 };

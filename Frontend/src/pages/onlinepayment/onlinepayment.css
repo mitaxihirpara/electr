@@ -1,0 +1,135 @@
+.payment-page {
+    min-height: 80vh;
+    background: #f4f8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.payment-card {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e3ebf8;
+}
+
+.payment-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #0a2c66;
+}
+
+.payment-methods {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.method {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #dbe6ff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.method.active {
+    border-color: #1e4db7;
+    background: #eef3ff;
+}
+
+.payment-inputs input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #dbe6ff;
+    font-size: 14px;
+}
+
+.payment-inputs input:focus {
+    outline: none;
+    border-color: #1e4db7;
+    box-shadow: 0 0 0 2px rgba(30, 77, 183, 0.1);
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #1e4db7, #0a2c66);
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pay-btn:hover {
+    opacity: 0.9;
+}
+
+.pay-btn:disabled {
+    background: #cbd6f5;
+    cursor: not-allowed;
+}
+
+.upi-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #0a2c66;
+}
+
+.upi-apps {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.upi-app {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #dbe6ff;
+    background: #f4f8ff;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.3s;
+    color: #0a2c66;
+    font-weight: 500;
+}
+
+.upi-app:hover {
+    background: #e6edff;
+    border-color: #1e4db7;
+}
+
+.upi-or {
+    text-align: center;
+    font-size: 12px;
+    margin: 10px 0;
+    color: #888;
+}

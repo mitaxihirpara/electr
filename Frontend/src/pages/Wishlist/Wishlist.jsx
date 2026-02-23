@@ -30,10 +30,14 @@ import React, { useEffect, useState } from "react";
 import "./Wishlist.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const customer_id = localStorage.getItem("customer_id");
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -88,9 +92,16 @@ const Wishlist = () => {
       <div className="wishlist-grid">
         {wishlistItems.map(item => (
           <div className="wishlist-card" key={item.id}>
-            <div className="wishlist-image">
-              <img src={`http://localhost:5000/uploads/${item.category}/${item.image}`} alt={item.name} />
-              <span className="remove-icon" onClick={() => handleRemove(item.id)}>
+            <div 
+                className="wishlist-image"
+                onClick={() => navigate(`/product/${item.id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src={`http://localhost:5000/uploads/${item.category}/${item.image}`}
+                  alt={item.name}
+                />
+ <span className="remove-icon" onClick={() => handleRemove(item.id)}>
                 <FontAwesomeIcon icon={faHeart} />
               </span>
             </div>

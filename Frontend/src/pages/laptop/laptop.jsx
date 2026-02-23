@@ -12,17 +12,35 @@ const LaptopCatalog = () => {
       .catch(err => console.error(err));
   }, []);
 
-  return (
-    <div className="catalog-container">
-      <h2>Laptops</h2>
+  const groupedLaptops = laptops.reduce((acc, laptop) => {
+  const sub = laptop.subcategory_name || "All Laptops";
 
-      <div className="catalog-grid">
-        {laptops.map((laptop, index) => (
-          <ProductCard key={laptop.id || index} product={laptop} />
-        ))}
-      </div>
+  if (!acc[sub]) {
+    acc[sub] = [];
+  }
+
+  acc[sub].push(laptop);
+  return acc;
+}, {});
+  return (
+    <div className="catalog-wrapper">
+      {/* <h2>Laptops</h2> */}
+
+      {Object.keys(groupedLaptops).map((sub) => (
+        <div key={sub} className="subcategory-section">
+          <h3 className="subcategory-title">{sub}</h3>
+
+          <div className="catalog-grid">
+            {groupedLaptops[sub].map((laptop) => (
+              <ProductCard key={laptop.id} product={laptop} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
+
+
 
 export default LaptopCatalog;

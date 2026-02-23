@@ -1,99 +1,8 @@
-// import { useEffect, useState } from "react";
-// import "./feedback.css";
 
-// const Feedback = ({ productId }) => {
-//   const [comment, setComment] = useState("");
-//   const [feedbacks, setFeedbacks] = useState([]);
-
-//   // fetch feedbacks
-//   const loadFeedbacks = () => {
-//     fetch(`http://localhost:5000/api/feedback/${productId}`)
-//       .then(res => res.json())
-//       .then(data => setFeedbacks(data));
-//   };
-
-
-//   useEffect(() => {
-//     loadFeedbacks();
-//   }, [productId]);
-
-//   const submitFeedback = (e) => {
-//   if (e) e.preventDefault();
-
-//   const userId = localStorage.getItem("customer_id");
-//   const userName = localStorage.getItem("customer_name");
-
-//   if (!userId) {
-//     alert("Please login to give feedback");
-//     return false;
-//   }
-
-//   if (!comment.trim()) {
-//     alert("Please write feedback");
-//     return false;
-//   }
-
-
-
-//   fetch("http://localhost:5000/api/feedback", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({
-//       product_id: productId,
-//       customer_id: userId,
-//       customer_name: userName,
-//       comment: comment
-//     })
-//   })
-
-    
-//     .then((res) => res.json())
-//     .then((data) => {
-//       console.log("Response:", data);
-//       setComment("");
-//       loadFeedbacks();
-//     })
-//     .catch((err) => {
-//       console.error("Error:", err);
-//       alert("Feedback submit failed");
-//     });
-// };
-
-
-//   return (
-//     <div className="feedback-container">
-//       <h3>Customer Feedback</h3>
-//       {/* <form onSubmit={submitFeedback}> */}
-//       <textarea
-//         placeholder="Write your feedback..."
-//         value={comment}
-//         onChange={(e) => setComment(e.target.value)}
-//         />
-//          <button type="button" onClick={submitFeedback}>
-//   Submit
-// </button>
-
-// {/* </form> */}
-      
-
-//       {/* <button onClick={submitFeedback}>Submit</button> */}
-
-//       <div className="feedback-list">
-//         {feedbacks.map((f) => (
-//           <div key={f.feedback_id} className="feedback-card">
-//             <strong>{f.customer_name}</strong>
-//             <p>{f.comment}</p>
-//             <span>{new Date(f.created_at).toLocaleString()}</span>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Feedback;
 import { useEffect, useState } from "react";
 import "./feedback.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 const Feedback = ({ productId }) => {
   const [comment, setComment] = useState("");
@@ -150,17 +59,19 @@ const Feedback = ({ productId }) => {
 
   return (
     <div className="feedback-container">
-      <h3>Customer Feedback</h3>
+      <h3>Review this product</h3>
+      <div className="feedback-input">
+  <textarea
+    placeholder="Write a product Review..."
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+  />
 
-      <textarea
-        placeholder="Write your feedback..."
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-
-      <button type="button" onClick={submitFeedback}>
-        Submit
-      </button>
+  <button type="button" onClick={submitFeedback}>
+    <FontAwesomeIcon icon={faPaperPlane} />
+  </button>
+</div>
+     
 
       <div className="feedback-list">
         {feedbacks.map((f) => (

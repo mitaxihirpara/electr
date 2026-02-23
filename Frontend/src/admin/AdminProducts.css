@@ -48,3 +48,12 @@
     border: none;
     cursor: pointer;
 }
+
+
+/* style inactive products row lightly */
+
+.admin-table tr.inactive {
+    background-color: #fdf0f0;
+    /* light red */
+    color: #555;
+}

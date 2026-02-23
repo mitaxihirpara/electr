@@ -53,3 +53,32 @@
     flex: 1;
     padding: 32px 40px;
 }
+
+
+/* 🔝 Admin sidebar logo */
+
+.admin-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #2f3a4a;
+}
+
+.admin-logo img {
+    width: 85px;
+    /* 🔥 INCREASED */
+    height: auto;
+    object-fit: contain;
+}
+
+.admin-logo span {
+    font-size: 18px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.admin-logo:hover {
+    background-color: #1f2937;
+}

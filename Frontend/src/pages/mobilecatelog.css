@@ -39,3 +39,18 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+/* new */
+
+.subcategory-section {
+    margin-bottom: 40px;
+}
+
+.subcategory-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+    color: #333;
+}

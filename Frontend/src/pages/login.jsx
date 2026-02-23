@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
 
@@ -9,6 +9,35 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+    // logout
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const customerId = localStorage.getItem("customer_id");
+    // const adminId = localStorage.getItem("admin_id");
+
+    if (customerId ) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("customer_id");
+    localStorage.removeItem("customer_name");
+    // localStorage.removeItem("admin_id");
+    // localStorage.removeItem("admin_name");
+    localStorage.removeItem("role");
+
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
+
+
+
+
+
+
 
   // ✅ LOGIN API
 
@@ -100,7 +129,26 @@ const Login = () => {
       }
     }
   };
-
+  // 🔁 ALREADY LOGGED IN UI
+  if (isLoggedIn) {
+    return (
+      <div className="login">
+        <div className="loginform">
+          <h2>You are already logged in ✅</h2>
+          <p style={{ margin: "15px 0", color: "#555" }}>
+            Want to login with another account?
+          </p>
+          <button
+            type="button"
+            className="logout-btn"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    );
+  }
 
 
 

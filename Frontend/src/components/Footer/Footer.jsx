@@ -39,8 +39,6 @@ const Footer = () => {
             <Link to="/airconditioners">Air Conditioners</Link>
           </li><li>
             <Link to="/small-appliances">Kitchen Appliances</Link>
-          </li><li>
-            <Link to="/subcategory">Accessories</Link>
           </li>
       
         

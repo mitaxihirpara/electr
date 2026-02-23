@@ -64,9 +64,9 @@ const AdminProducts = () => {
           </tr>
         </thead>
 
-        <tbody>
+        {/* <tbody>
           {products.map(product => (
-            <tr key={product.id}>
+            <tr key={product.id} className={!product.is_active ? "inactive" : ""}>
               <td>{product.id}</td>
               <td>{product.name}</td>
               <td>{product.category}</td>
@@ -84,7 +84,31 @@ const AdminProducts = () => {
               </td>
             </tr>
           ))}
-        </tbody>
+        </tbody> */}
+        <tbody>
+  {products.map(product => {
+    const isActive = product.is_active === 1 || product.is_active === true || product.is_active === "1";
+    return (
+      <tr key={product.id}>
+        <td>{product.id}</td>
+        <td>{product.name}</td>
+        <td>{product.category}</td>
+        <td>₹{product.price}</td>
+        <td>{product.stock}</td>
+        <td>{isActive ? "Active" : "Inactive"}</td>
+        <td>
+          <button
+            className={isActive ? "deactivate-btn" : "activate-btn"}
+            onClick={() => toggleStatus(product.id, isActive)}
+          >
+            {isActive ? "Deactivate" : "Activate"}
+          </button>
+        </td>
+      </tr>
+    )
+  })}
+</tbody>
+
 
       </table>
     </div>

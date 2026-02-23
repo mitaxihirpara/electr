@@ -1,44 +1,51 @@
-import "./About.css";
+
+import "./about.css";
 
 const About = () => {
   return (
-    <div className="about-container">
-      <h1>About ElectroMart</h1>
+    <div className="about-wrapper">
 
-      <p>
-        Welcome to <strong>ElectroMart</strong> — your one-stop destination for
-        the latest and most reliable electronic products. We aim to make
-        technology accessible, affordable, and trustworthy for everyone.
-      </p>
+      {/* HERO */}
+      <section className="about-hero">
+        <h1>About ElectroMart</h1>
+        <p>
+          Delivering innovation, quality, and trust in every electronic product.
+        </p>
+      </section>
 
-      <h2>Who We Are</h2>
-      <p>
-        ElectroMart is an online electronics store offering a wide range of
-        products including smartphones, smart TVs, laptops, and accessories.
-        Our platform is built to deliver a smooth and secure shopping experience.
-      </p>
+      {/* ABOUT SECTION */}
+      <section className="about-main">
+        <div className="about-image">
+          <img
+            src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+            alt="electronics"
+          />
+        </div>
 
-      <h2>What We Offer</h2>
-      <ul>
-        <li>✔ Latest Smartphones & Smart TVs</li>
-        <li>✔ Genuine Products with Warranty</li>
-        <li>✔ Competitive Pricing</li>
-        <li>✔ Easy Ordering & Secure Payments</li>
-        <li>✔ Fast & Reliable Support</li>
-      </ul>
+        <div className="about-text">
+          <h2>Who We Are</h2>
+          <p>
+            ElectroMart is your trusted online electronics store offering
+            smartphones, laptops, smart TVs, and accessories at competitive
+            prices. Our platform ensures secure transactions and reliable
+            delivery.
+          </p>
 
-      <h2>Our Mission</h2>
-      <p>
-        Our mission is to bring quality electronics to your doorstep while
-        ensuring trust, transparency, and customer satisfaction.
-      </p>
+          <div className="highlight-points">
+            <div>✔ Genuine Products</div>
+            <div>✔ Secure Payments</div>
+            <div>✔ Fast Delivery</div>
+          </div>
+        </div>
+      </section>
 
-      <h2>Why Choose ElectroMart?</h2>
-      <p>
-        We focus on quality, user experience, and continuous improvement.
-        ElectroMart is designed for customers who value simplicity, speed, and
-        reliability.
-      </p>
+      {/* FEATURE STRIP */}
+      <section className="about-strip">
+        <div>1000+ Products</div>
+        <div>5000+ Customers</div>
+        <div>24/7 Support</div>
+      </section>
+
     </div>
   );
 };

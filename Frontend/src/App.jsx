@@ -23,7 +23,7 @@ import BrandProducts from "./pages/BrandProducts";
 import Checkout from "./pages/checkout";
 import OrderDetails from "./pages/OrderDetails";
 import OrderTracking from "./components/OrderTracking";
-
+import Payment from "./pages/onlinepayment/onlinepayment";
 
 
 import MobileCatalog from "./pages/mobilecatelog";
@@ -54,6 +54,8 @@ import AdminLayout from "./admin/AdminLayout";
 import Customers from "./admin/Customers";
 import CustomerDetails from "./admin/Customerdetails";
 import AdminOrderDetails from './admin/AdminOrderDetails';
+import AdminReports from "./admin/reports";
+import Reports from "./admin/reports";
 
 
 
@@ -106,11 +108,12 @@ const App = () => {
         <Route path="/cancellation-returns" element={<CancellationReturns />} />
         <Route path="/brand/:brand" element={<BrandProducts />} />
         <Route path="/checkout" element={<Checkout />} />
+        {/* <Route path="/orders/:id" element={<OrderDetails />} /> */}
         <Route path="/orders/:id" element={<OrderDetails />} />
 
         <Route path="/wishlist" element={<Wishlist />}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
+        <Route path="/payment" element={<Payment />} />
         
   
 
@@ -129,7 +132,10 @@ const App = () => {
         <Route path="orders" element={<AdminOrders />} />
         <Route path="customers" element={<Customers />} />
         <Route path="customers/:id" element={<CustomerDetails />} />
-        <Route path="/admin/order/:orderId" element={<AdminOrderDetails />} />
+        {/* <Route path="/admin/order/:orderId" element={<AdminOrderDetails />} /> */}
+        <Route path="order/:orderId" element={<AdminOrderDetails />} />
+        <Route path="reports" element={<Reports />} />
+       
         </Route>
         
         <Route path="*" element={<Navigate to="/" />} />

@@ -1,18 +1,74 @@
-.about-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    line-height: 1.7;
+.about-wrapper {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f8ff;
+    color: #333;
 }
 
-.about-container h1 {
+.about-hero {
+    text-align: center;
+    padding: 80px 20px 50px;
+}
+
+.about-hero h1 {
+    font-size: 40px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.about-hero p {
+    color: #555;
+    font-size: 17px;
+}
+
+.about-main {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    padding: 60px 10%;
+    flex-wrap: wrap;
+}
+
+.about-image img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15);
+}
+
+.about-text {
+    flex: 1;
+    min-width: 280px;
+}
+
+.about-text h2 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.about-text p {
+    line-height: 1.7;
     margin-bottom: 20px;
 }
 
-.about-container h2 {
-    margin-top: 30px;
+.highlight-points div {
+    background: white;
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.08);
 }
 
-.about-container ul {
-    margin-left: 20px;
+.about-strip {
+    background: linear-gradient(to right, #007bff, #4da3ff);
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 25px 10%;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.about-strip div {
+    margin: 10px;
 }

@@ -3,6 +3,9 @@ from flask_cors import CORS
 from flask import render_template_string
 import mysql.connector
 import os
+import razorpay
+
+razorpay_client = razorpay.Client(auth=("YOUR_KEY_ID", "YOUR_KEY_SECRET"))
 
 # app = Flask(__name__)
 app = Flask(
@@ -243,13 +246,13 @@ def get_product_feedback(product_id):
 
     cursor.execute("""
         SELECT
-            id,
+            feedback_id,
             customer_name,
             comment,
             created_at
         FROM feedback
         WHERE product_id = %s
-        ORDER BY id DESC
+        ORDER BY feedback_id DESC
     """, (product_id,))
 
     feedbacks = cursor.fetchall()
@@ -299,7 +302,7 @@ def get_all_feedback():
 
     cursor.execute("""
         SELECT
-            pf.id,
+            pf.product_id,
             p.name AS product_name,
             pf.customer_name,
             pf.comment,
@@ -505,21 +508,6 @@ def add_product():
 
     return jsonify({"message": "Product added successfully"}), 200
 
-
-#deactivate product 
-# @app.route("/api/products/<int:id>/status", methods=["PUT"])
-# def toggle_product_status(id):
-#     db = get_db()
-#     cursor = db.cursor()
-#     cursor.execute("""
-#         UPDATE products
-#         SET is_active = NOT is_active
-#         WHERE id = %s
-#     """, (id,))
-#     db.commit()
-#     cursor.close()
-#     db.close()
-#     return jsonify({"message": "Product status updated"})
 
 # Flask example
 @app.route("/api/products/<int:id>/status", methods=["PUT"])
@@ -792,11 +780,7 @@ def laptops():
         l["image"] = f"http://localhost:5000/uploads/{folder}/{l['image']}"
 
     cursor.close()
-    # cursor.execute("SELECT id, name, price, image FROM products WHERE category='laptop'AND is_active=1")
-    # laptops = cursor.fetchall()
 
-    # for l in laptops:
-    #     l["image"] = f"http://localhost:5000/uploads/laptop/{l['image']}"
 
     db.close()
     return jsonify(laptops)
@@ -897,12 +881,6 @@ def computers():
         c["image"] = f"http://localhost:5000/uploads/{folder}/{c['image']}"
 
     cursor.close()
-    # cursor.execute("SELECT id, name, price, image FROM products WHERE category='computer'AND is_active=1")
-    # items = cursor.fetchall()
-
-    # for p in items:
-    #     p["image"] = f"http://localhost:5000/uploads/computer/{p['image']}"
-
     db.close()
     return jsonify(computers)
 
@@ -1035,27 +1013,10 @@ def brand_products(brand_name):
     return jsonify(products)
 
 
-
-
-
-# @app.route("/api/products/<int:id>", methods=["DELETE"])
-# def admin_delete_product(id):
-#     db = get_db()
-#     cursor = db.cursor()
-
-#     cursor.execute("DELETE FROM products WHERE id=%s", (id,))
-#     db.commit()
-
-#     db.close()
-#     return jsonify({"success": True})
-
 # ---------------- IMAGE SERVE ----------------
 @app.route("/uploads/<path:filename>")
 def serve_image(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
-
-
-
 
 
 #orders
@@ -1105,7 +1066,7 @@ def get_cust_orders(customer_id):
 
             image_url = f"http://localhost:5000/uploads/{folder}/{row['image']}"
   
-        # image_url = f"http://localhost:5000/uploads/{row['category']}/{row['image']}"
+
         orders[oid]["products"].append({
             "name": row["product_name"],
             "quantity": row["quantity"],
@@ -1117,34 +1078,7 @@ def get_cust_orders(customer_id):
 
     return jsonify({"orders": list(orders.values())})
 
-       
-
-#update order 
-# @app.route("/api/admin/order/status", methods=["PUT"])
-# def update_order_status():
-#     data = request.json
-#     order_id = data.get("order_id")
-#     status = data.get("status")
-
-#     if status not in ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"]:
-#         return jsonify({"message": "Invalid status"}), 400
-
-#     db = get_db()
-#     cursor = db.cursor()
-
-#     cursor.execute("""
-#         UPDATE orders
-#         SET order_status=%s
-#         WHERE id=%s
-#     """, (status, order_id))
-
-    # db.commit()
-    # cursor.close()
-    # db.close()
-
-    # return jsonify({"message": "Order status updated"})
-
-
+    
 #cancel order customer 
 @app.route("/api/orders/cancel/<int:order_id>", methods=["PUT"])
 def cancel_order(order_id):
@@ -1225,70 +1159,6 @@ def get_single_order(order_id):
     })
          
     return jsonify(order)
-
-
-# @app.route("/api/order-details/<int:order_id>")
-# def get_order_details(order_id):
-#     db = get_db()
-#     cursor = db.cursor(dictionary=True)
-
-#     cursor.execute("""
-#         SELECT 
-#             o.id AS order_id,
-#             o.total_amount,
-#             o.payment_method,
-#             o.order_status,
-#             o.order_date,
-    #         o.address,
-
-    #         p.name AS product_name,
-    #         p.image,
-    #         p.category,
-    #         od.quantity,
-    #         od.price
-    #     FROM orders o
-    #     JOIN order_details od ON o.id = od.order_id
-    #     JOIN products p ON od.product_id = p.id
-    #     WHERE o.id = %s
-    # """, (order_id,))
-
-    # rows = cursor.fetchall()
-
-    # if not rows:
-    #     cursor.close()
-    #     db.close()
-    #     return jsonify({"message": "Order not found"}), 404
-
-    # order = {
-    #     "id": rows[0]["order_id"],
-    #     "order_status": rows[0]["order_status"],
-    #     "payment_method": rows[0]["payment_method"],
-    #     "order_date": rows[0]["order_date"],
-    #     "address": rows[0]["address"],
-    #     "total_amount": rows[0]["total_amount"],
-    #     "products": []
-    # }
-
-    # for r in rows:
-    #     folder = r["category"]
-    #     if folder == "smallaplliance":
-    #                 folder = "smallappliance"
-
-    #     image_url = f"http://localhost:5000/uploads/{folder}/{r['image']}"
-
-    #        # image_url = f"http://localhost:5000/uploads/{r['category']}/{r['image']}"
-    #     order["products"].append({
-    #         "name": r["product_name"],
-    #         "image": image_url,
-    #         "quantity": r["quantity"],
-    #         "price": r["price"]
-    #     })
-
-    # cursor.close()
-    # db.close()
-
-    # return jsonify(order)
-
 
 
 @app.route("/api/order-details/<int:order_id>", methods=["GET"])
@@ -1484,30 +1354,6 @@ def admin_dashboard():
     })
 
 
-# @app.route("/api/admin/orders", methods=["GET"])
-# def admin_orders():
-#     db = get_db()
-#     cursor = db.cursor(dictionary=True)
-
-#     cursor.execute("""
-#         SELECT 
-#             id AS order_id,
-#             customer_name,
-#             total_amount,
-#             order_status,
-#             order_date
-#         FROM orders
-#         ORDER BY id DESC
-#     """)
-
-#     orders = cursor.fetchall()
-
-#     cursor.close()
-#     db.close()
-
-#     return jsonify({"orders": orders})
-
-
 
 
 @app.route("/api/admin/order-status/<int:order_id>", methods=["PUT"])
@@ -1591,6 +1437,7 @@ def get_wishlist(customer_id):
 @app.route("/api/place-order", methods=["POST"])
 def place_order():
     data = request.json
+    
     print("ORDER DATA RECEIVED:", data)
 
     customer_id = data.get("customer_id")
@@ -1598,30 +1445,37 @@ def place_order():
     address = data.get("address")
     total_amount = data.get("total_amount")
     payment_method = data.get("payment_method", "COD")
-
+    transaction_id = data.get("transaction_id")
+   
     if not customer_id or not customer_name or not address or not total_amount:
         return jsonify({"message": "Missing required fields"}), 400
-
+     
+    # if payment_method != "COD" and not transaction_id:
+    #     return jsonify({"message": "Transaction ID missing"}), 400
+ 
     conn = None
     try:
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
 
         # 1️⃣ Insert into orders
+        
         cursor.execute("""
-            INSERT INTO orders
-            (customer_id, customer_name, address, total_amount, payment_method, payment_status, order_status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (
-            customer_id,
-            customer_name,
-            address,
-            total_amount,
-            payment_method,
-            "Pending" if payment_method == "COD" else "Paid",
-            "PLACED"
-        ))
-
+    INSERT INTO orders
+    (customer_id, address_id, customer_name, address, total_amount,
+     payment_method, payment_status, order_status, transaction_id)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+""", (
+    customer_id,
+    None,   # 👈 address_id
+    customer_name,
+    address,
+    total_amount,
+    payment_method,
+    "Pending" if payment_method == "COD" else "Paid",
+    "PLACED",
+    transaction_id
+))
         order_id = cursor.lastrowid
 
         # 2️⃣ Fetch cart items
@@ -1799,11 +1653,29 @@ def generate_invoice(order_id):
         grand_total=grand_total
     )
 
+@app.route("/api/create-razorpay-order", methods=["POST"])
+def create_razorpay_order():
+    data = request.json
+    amount = int(float(data.get("amount")) * 100)  # convert to paise
+
+    try:
+        razorpay_order = razorpay_client.order.create({
+            "amount": amount,
+            "currency": "INR",
+            "payment_capture": 1
+        })
+
+        return jsonify({
+            "id": razorpay_order["id"],
+            "amount": razorpay_order["amount"],
+            "currency": razorpay_order["currency"]
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/admin/reports")
 def admin_reports():
-    # month = request.args.get("month")
-    # year = request.args.get("year")
     month = int(request.args.get("month"))
     year = int(request.args.get("year"))
 

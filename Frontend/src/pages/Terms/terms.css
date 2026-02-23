@@ -1,15 +1,65 @@
-.terms-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    line-height: 1.7;
+.terms-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #eef5ff, #ffffff);
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
 }
 
-.terms-container h1 {
-    margin-bottom: 20px;
+.terms-box {
+    max-width: 950px;
+    width: 100%;
+    background: #ffffff;
+    padding: 50px;
+    border-radius: 14px;
+    box-shadow: 0 10px 35px rgba(0, 76, 255, 0.08);
 }
 
-.terms-container h2 {
-    margin-top: 25px;
-    font-size: 20px;
+.terms-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.terms-header h1 {
+    font-size: 34px;
+    color: #0a3d91;
+    margin-bottom: 10px;
+}
+
+.terms-subtitle {
+    color: #555;
+}
+
+.terms-card {
+    background: #f8fbff;
+    border-left: 5px solid #0a3d91;
+    padding: 22px 28px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.terms-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 76, 255, 0.12);
+}
+
+.terms-card h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #0a3d91;
+}
+
+.terms-card p {
+    color: #444;
+    line-height: 1.6;
+}
+
+.contact-section {
+    margin-top: 30px;
+    background: #0a3d91;
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
 }
